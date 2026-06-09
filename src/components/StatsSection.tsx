@@ -4,7 +4,7 @@ export default function StatsSection() {
   const stats = [
     { icon: Users, label: 'Clientes Atendidos', value: '+500' },
     { icon: Briefcase, label: 'Serviços Realizados', value: '+1000' },
-    { icon: Smile, label: 'Clientes Satisfeitos', value: '98%' },
+    { icon: Smile, label: 'Clientes Satisfeitos', value: '100%' },
   ];
 
   return (
