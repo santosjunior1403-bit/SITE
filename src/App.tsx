@@ -16,6 +16,7 @@ import AdminTestimonials from './pages/AdminTestimonials';
 import AdminClients from './pages/AdminClients';
 import AdminHome from './pages/AdminHome';
 import AdminSettings from './pages/AdminSettings';
+import AdminGoogleAds from './pages/AdminGoogleAds';
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="testimonials" element={<AdminTestimonials />} />
           <Route path="clients" element={<AdminClients />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="google-ads" element={<AdminGoogleAds />} />
         </Route>
       </Routes>
     </BrowserRouter>

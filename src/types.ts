@@ -85,3 +85,22 @@ export interface Client {
   active: boolean;
   order: number;
 }
+
+export interface GoogleAdsSettings {
+  id: string;
+  gtm_id: string;
+  ga4_measurement_id: string;
+  google_ads_conversion_id: string;
+  conversion_label_whatsapp: string;
+  conversion_label_phone: string;
+  conversion_label_form: string;
+  conversion_label_quote: string;
+  track_whatsapp: boolean;
+  track_phone: boolean;
+  track_form: boolean;
+  track_quote: boolean;
+  track_page_view: boolean;
+  active: boolean;
+  custom_head_code: string;
+  custom_body_code: string;
+}
