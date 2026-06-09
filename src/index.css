@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --color-nexo-dark-blue: #081A3A;
+    --color-nexo-blue: #0D47A1;
+    --color-nexo-green: #00C853;
+  }
   body {
-    @apply bg-gray-950 text-white min-h-screen;
+    @apply bg-[#081A3A] text-white min-h-screen font-sans;
   }
 }

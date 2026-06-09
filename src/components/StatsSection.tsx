@@ -12,7 +12,7 @@ export default function StatsSection() {
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
         {stats.map((s, i) => (
           <div key={i} className="flex items-center gap-4 bg-gray-900 p-6 rounded-2xl border border-gray-800">
-            <s.icon className="w-12 h-12 text-blue-500" />
+            <s.icon className="w-12 h-12 text-green-500" />
             <div>
               <div className="text-4xl font-bold text-white">{s.value}</div>
               <div className="text-gray-400">{s.label}</div>
