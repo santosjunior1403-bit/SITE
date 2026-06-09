@@ -1,3 +1,5 @@
+import { User } from 'lucide-react';
+
 export default function Footer() {
   return (
     <footer className="bg-[#081A3A] text-gray-300 py-16 border-t border-white/10">
@@ -22,8 +24,14 @@ export default function Footer() {
             </ul>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-white/5 text-center text-sm text-gray-500">
-        © 2026 NEXO Dedetizadora. Todos os direitos reservados.
+      <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+        <div>© 2026 NEXO Dedetizadora. Todos os direitos reservados.</div>
+        <a 
+          href="/admin" 
+          className="text-gray-600/30 hover:text-gray-400 text-[11px] uppercase tracking-wider transition-colors duration-200"
+        >
+          Área de Membros
+        </a>
       </div>
     </footer>
   );
