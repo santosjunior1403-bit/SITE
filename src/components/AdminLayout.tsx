@@ -38,7 +38,7 @@ export default function AdminLayout() {
         <h1 className="text-xl font-bold mb-8 text-blue-400">NEXO Painel</h1>
         <nav className="space-y-4">
              <Link to="/" className="block text-gray-300 hover:text-white mb-6 underline">← Voltar ao site</Link>
-             <Link to="/admin" className="block text-gray-300 hover:text-white">Dashboard</Link>
+             <Link to="/admin/dashboard" className="block text-gray-300 hover:text-white">Dashboard</Link>
              <Link to="/admin/company" className="block text-gray-300 hover:text-white">Dados da Empresa</Link>
              <Link to="/admin/home" className="block text-gray-300 hover:text-white">Página Inicial</Link>
              <Link to="/admin/services" className="block text-gray-300 hover:text-white">Serviços</Link>

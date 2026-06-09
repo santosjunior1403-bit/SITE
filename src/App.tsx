@@ -12,6 +12,10 @@ import AdminCompany from './pages/AdminCompany';
 import AdminServices from './pages/AdminServices';
 import AdminBlog from './pages/AdminBlog';
 import BlogPostPage from './pages/BlogPostPage';
+import AdminTestimonials from './pages/AdminTestimonials';
+import AdminClients from './pages/AdminClients';
+import AdminHome from './pages/AdminHome';
+import AdminSettings from './pages/AdminSettings';
 
 export default function App() {
   return (
@@ -21,15 +25,15 @@ export default function App() {
         <Route path="/blog/:id" element={<BlogPostPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Admin />} />
-          <Route path="dashboard" element={<Navigate to="/admin" />} />
+          <Route index element={<Navigate to="/admin/dashboard" />} />
+          <Route path="dashboard" element={<Admin />} />
+          <Route path="home" element={<AdminHome />} />
           <Route path="company" element={<AdminCompany />} />
-          <Route path="home" element={<div className="p-4">Gerenciar Página Inicial</div>} />
           <Route path="services" element={<AdminServices />} />
           <Route path="blog" element={<AdminBlog />} />
-          <Route path="testimonials" element={<div className="p-4">Gerenciar Avaliações</div>} />
-          <Route path="clients" element={<div className="p-4">Gerenciar Clientes/Parceiros</div>} />
-          <Route path="settings" element={<div className="p-4">Configurações</div>} />
+          <Route path="testimonials" element={<AdminTestimonials />} />
+          <Route path="clients" element={<AdminClients />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>
     </BrowserRouter>
