@@ -1,0 +1,6 @@
+{
+  "name": "Nexo Dedetizadora",
+  "description": "Site profissional para empresa de controle de pragas, com painel administrativo e integração com Supabase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
