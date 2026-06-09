@@ -23,6 +23,11 @@ export default function HeroSection() {
           <p className="text-xl mb-8 text-gray-300">
             {data.subtitle}
           </p>
+          <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-400">
+              <span className="flex items-center gap-1">✅ Garantia</span>
+              <span className="flex items-center gap-1">✅ Atendimento Rápido</span>
+              <span className="flex items-center gap-1">✅ Orçamento Grátis</span>
+          </div>
           <div className="flex gap-4">
             <a href={`https://wa.me/${data.whatsapp_number}`} className="bg-blue-600 text-white px-8 py-4 rounded-full font-bold hover:bg-blue-500">{data.button_text}</a>
           </div>
