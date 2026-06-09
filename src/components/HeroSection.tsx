@@ -20,7 +20,7 @@ export default function HeroSection() {
       className="relative w-full min-h-screen flex items-center pt-20 bg-cover bg-center hero"
       style={{ backgroundImage: data.image_url ? `url(${data.image_url})` : 'none', backgroundColor: '#081A3A' }}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-[#000a23]/95 via-[#00143c]/85 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#081A3A]/80 via-[#081A3A]/40 to-transparent" />
       
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 hero-content">
         <div className="max-w-2xl text-left">
@@ -39,9 +39,6 @@ export default function HeroSection() {
           </div>
 
           <div className="flex flex-wrap gap-4 mb-10 justify-start">
-            <a href={`https://wa.me/${data.whatsapp_number}`} className="bg-[#0D47A1] text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold hover:bg-[#081A3A] border border-[#0D47A1] transition-all text-base md:text-lg">
-                Solicitar Orçamento
-            </a>
             <a href={`https://wa.me/${data.whatsapp_number}`} className="bg-[#00C853] text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold hover:bg-[#00a846] transition-all flex items-center gap-2 text-base md:text-lg">
                 <Users className="w-5 h-5 md:w-6 md:h-6" /> {data.button_text}
             </a>
