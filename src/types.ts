@@ -1,38 +1,87 @@
 export interface CompanySettings {
   id: string;
   name: string;
-  logo_url: string;
+  cnpj: string;
+  address: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zip: string;
   phone: string;
   whatsapp: string;
   email: string;
-  address: string;
-  region: string;
   instagram: string;
   facebook: string;
-  footer_text: string;
-  main_color: string;
+  google_business_link: string;
+  opening_hours: string;
+  service_region: string;
+  institutional_text: string;
+  logo_url: string;
+  team_photo_url: string;
+}
+
+export interface HeroSection {
+  id: string;
+  logo_url: string;
+  title: string;
+  subtitle: string;
+  image_url: string;
+  button_text: string;
+  whatsapp_number: string;
+  phone: string;
+  email: string;
+  whatsapp_message: string;
+  banner_url: string;
+  primary_color: string;
+  secondary_color: string;
 }
 
 export interface Service {
   id: string;
   name: string;
-  description: string;
-  icon_name: string;
-  image_url: string;
-  active: boolean;
+  short_description: string;
+  full_description: string;
+  category: string;
+  price?: number;
   order: number;
+  active: boolean;
+  image_url: string;
+  icon_url: string;
+  whatsapp_message: string;
 }
 
 export interface BlogPost {
   id: string;
   title: string;
   subtitle: string;
-  image_url: string;
+  summary: string;
   content: string;
+  main_image_url: string;
   category: string;
   author: string;
-  created_at: string;
-  active: boolean;
+  published_at: string;
   featured: boolean;
+  active: boolean;
+  order: number;
+}
+
+export interface Testimonial {
+  id: string;
+  client_name: string;
+  photo_url: string;
+  text: string;
+  rating: number;
+  google_review_url: string;
+  active: boolean;
+  date: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  logo_url: string;
+  description: string;
+  client_type: 'cliente' | 'parceiro';
+  active: boolean;
   order: number;
 }
