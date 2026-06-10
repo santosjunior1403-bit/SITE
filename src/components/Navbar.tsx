@@ -13,7 +13,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="fixed w-full z-50 bg-gradient-to-r from-white via-white via-40% to-blue-50/90 backdrop-blur-lg border-b border-gray-100 text-gray-900 font-medium shadow-sm transition-all duration-300">
+    <nav className="fixed w-full z-50 bg-gradient-to-r from-white via-blue-100/85 to-blue-200/90 backdrop-blur-lg border-b border-blue-200/60 text-gray-900 font-medium shadow-sm transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex-shrink-0 flex items-center">

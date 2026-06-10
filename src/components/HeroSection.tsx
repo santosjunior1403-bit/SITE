@@ -5,10 +5,24 @@ import { Check, Zap, Award, Star, Users } from 'lucide-react';
 
 export default function HeroSection() {
   const [data, setData] = useState<HeroType | null>(null);
+  const [satisfiedCount, setSatisfiedCount] = useState('+500');
 
   useEffect(() => {
     supabase.from('hero_section').select('*').single().then(({ data }) => {
       if (data) setData(data);
+    });
+
+    supabase.from('company_settings').select('institutional_text').single().then(({ data }) => {
+      if (data && data.institutional_text) {
+        try {
+          const parsed = JSON.parse(data.institutional_text);
+          if (parsed && typeof parsed === 'object') {
+            setSatisfiedCount(parsed.clientes_atendidos || '+500');
+          }
+        } catch (e) {
+          console.error("Error parsing stats", e);
+        }
+      }
     });
   }, []);
 
@@ -52,7 +66,7 @@ export default function HeroSection() {
                 <div className="flex gap-1 text-[#00C853]">
                     {[1,2,3,4,5].map(i => <Star key={i} fill="currentColor" className="w-4 h-4" />)}
                 </div>
-                <div className="text-sm text-gray-300">+500 clientes satisfeitos</div>
+                <div className="text-sm text-gray-300">{satisfiedCount} clientes satisfeitos</div>
             </div>
             <div className="ml-auto text-right">
                 <div className="font-bold text-2xl flex items-center gap-1">5.0</div>
