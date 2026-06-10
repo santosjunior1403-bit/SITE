@@ -10,11 +10,17 @@ export default function BlogPostPage() {
   const [post, setPost] = useState<BlogPost | null>(null);
 
   useEffect(() => {
-    async function fetchPost() {
-      const { data } = await supabase.from('blog_posts').select('*').eq('id', id).single();
-      if (data) setPost(data);
+    async function fetchPostAndCompany() {
+      const { data: postData } = await supabase.from('blog_posts').select('*').eq('id', id).single();
+      if (postData) {
+        setPost(postData);
+        // Fetch company name to display in tab
+        const { data: companyData } = await supabase.from('company_settings').select('company_name, name').single();
+        const companyName = companyData?.company_name || companyData?.name || 'NEXO Dedetizadora';
+        document.title = `${postData.title} | ${companyName}`;
+      }
     }
-    fetchPost();
+    fetchPostAndCompany();
   }, [id]);
 
   if (!post) return <div>Carregando...</div>;

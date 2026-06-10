@@ -24,6 +24,7 @@ export default function AdminLayout() {
         await supabase.auth.signOut();
         navigate('/admin/login');
       } else {
+        document.title = "Painel Administrativo | NEXO";
         setLoading(false);
       }
     };
