@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { uploadImage } from '../lib/storage';
 
@@ -45,7 +45,7 @@ export default function AdminSettings() {
       : await supabase.from('seo_settings').insert(form);
     
     if (error) alert("Erro: " + error.message);
-    else { alert("Salvo!"); fetchSettings(); }
+    else { alert("Salvo com sucesso!"); fetchSettings(); }
     setLoading(false);
   };
 

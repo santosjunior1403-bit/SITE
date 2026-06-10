@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Testimonial } from '../types';
 import { uploadImage } from '../lib/storage';
@@ -31,7 +31,7 @@ export default function AdminTestimonials() {
       ? await supabase.from('testimonials').update(form).eq('id', form.id)
       : await supabase.from('testimonials').insert(form);
     if (error) alert("Erro: " + error.message);
-    else { alert("Salvo!"); setForm({}); fetchT(); }
+    else { alert("Salvo com sucesso!"); setForm({}); fetchT(); }
     setLoading(false);
   };
 

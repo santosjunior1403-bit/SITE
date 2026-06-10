@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Service } from '../types';
 import { uploadImage } from '../lib/storage';
@@ -32,7 +32,7 @@ export default function AdminServices() {
       : await supabase.from('services').insert(form);
       
     if (error) alert("Erro: " + error.message);
-    else { alert("Salvo!"); setForm({}); fetchServices(); }
+    else { alert("Salvo com sucesso!"); setForm({}); fetchServices(); }
     setLoading(false);
   };
 

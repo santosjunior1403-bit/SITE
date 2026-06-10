@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { BlogPost } from '../types';
 import { uploadImage } from '../lib/storage';
@@ -31,7 +31,7 @@ export default function AdminBlog() {
       ? await supabase.from('blog_posts').update(form).eq('id', form.id)
       : await supabase.from('blog_posts').insert(form);
     if (error) alert("Erro: " + error.message);
-    else { alert("Salvo!"); setForm({}); fetchPosts(); }
+    else { alert("Salvo com sucesso!"); setForm({}); fetchPosts(); }
     setLoading(false);
   };
 

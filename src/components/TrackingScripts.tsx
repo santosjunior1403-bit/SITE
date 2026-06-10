@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { GoogleAdsSettings } from '../types';
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
 export function trackEvent(eventName: string, params?: Record<string, any>) {
     console.log(`Tracking event: ${eventName}`, params);
     // Implementation for GTM or GA would go here

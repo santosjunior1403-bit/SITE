@@ -1,19 +1,26 @@
 export interface CompanySettings {
   id: string;
   name: string;
+  company_name?: string;
   cnpj: string;
   address: string;
   neighborhood: string;
+  bairro?: string;
   city: string;
+  cidade?: string;
   state: string;
+  estado?: string;
   zip: string;
+  cep?: string;
   phone: string;
   whatsapp: string;
   email: string;
   instagram: string;
   facebook: string;
   google_business_link: string;
+  google_business_url?: string;
   opening_hours: string;
+  business_hours?: string;
   service_region: string;
   institutional_text: string;
   logo_url: string;
@@ -32,6 +39,7 @@ export interface HeroSection {
   email: string;
   whatsapp_message: string;
   banner_url: string;
+  secondary_banner_url?: string | null;
   primary_color: string;
   secondary_color: string;
 }

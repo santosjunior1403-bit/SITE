@@ -6,6 +6,7 @@ import { Check, Zap, Award, Star, Users } from 'lucide-react';
 export default function HeroSection() {
   const [data, setData] = useState<HeroType | null>(null);
   const [satisfiedCount, setSatisfiedCount] = useState('+500');
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     supabase.from('hero_section').select('*').single().then(({ data }) => {
@@ -24,15 +25,24 @@ export default function HeroSection() {
         }
       }
     });
+
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   if (!data) return null;
+
+  const activeBanner = isMobile && data.secondary_banner_url ? data.secondary_banner_url : data.image_url;
 
   return (
     <div 
       id="inicio" 
       className="relative w-full min-h-screen flex items-center pt-20 bg-cover bg-center hero"
-      style={{ backgroundImage: data.image_url ? `url(${data.image_url})` : 'none', backgroundColor: '#081A3A' }}
+      style={{ backgroundImage: activeBanner ? `url(${activeBanner})` : 'none', backgroundColor: '#081A3A' }}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-[#081A3A]/80 via-[#081A3A]/40 to-transparent" />
       

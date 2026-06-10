@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { CompanySettings } from '../types';
 import { uploadImage } from '../lib/storage';
@@ -56,6 +56,20 @@ export default function AdminCompany() {
 
     const payload = {
       ...form,
+      company_name: form.company_name || form.name,
+      name: form.company_name || form.name,
+      bairro: form.bairro || form.neighborhood || '',
+      neighborhood: form.bairro || form.neighborhood || '',
+      cidade: form.cidade || form.city || '',
+      city: form.cidade || form.city || '',
+      estado: form.estado || form.state || '',
+      state: form.estado || form.state || '',
+      cep: form.cep || form.zip || '',
+      zip: form.cep || form.zip || '',
+      business_hours: form.business_hours || form.opening_hours || '',
+      opening_hours: form.business_hours || form.opening_hours || '',
+      google_business_url: form.google_business_url || form.google_business_link || '',
+      google_business_link: form.google_business_url || form.google_business_link || '',
       institutional_text: JSON.stringify(stats)
     };
 
@@ -97,6 +111,106 @@ export default function AdminCompany() {
             <label className="block mb-2 text-gray-300 font-medium">Logo</label>
             {form.logo_url && <img src={form.logo_url} className="h-16 mb-2 border border-gray-600 rounded p-1 bg-white" />}
             <input type="file" onChange={(e) => handleUpload(e, 'logo_url')} className="bg-gray-700 p-2 rounded w-full text-gray-300" />
+        </div>
+
+        {/* Fale Conosco - Endereço, Horário e Redes Sociais */}
+        <div className="col-span-2 border-t border-gray-700/50 pt-6 mt-4">
+          <h3 className="text-lg font-bold mb-2 text-[#00C853] tracking-wide uppercase text-sm">Fale Conosco (Endereço, Horários e Redes)</h3>
+          <p className="text-xs text-gray-400 mb-4">
+            Gerencie todas as informações de contato direto e localização física exibidas no rodapé e canais de atendimento.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1 col-span-2">
+              <label className="text-sm text-gray-300 font-medium">Endereço (Rua, Número)</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.address || ''} 
+                onChange={e => setForm({...form, address: e.target.value})} 
+                placeholder="Ex: Av. Paulista, 1000 - Cj 50" 
+              />
+            </div>
+            
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-gray-300 font-medium">Bairro</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.bairro || form.neighborhood || ''} 
+                onChange={e => setForm({...form, bairro: e.target.value, neighborhood: e.target.value})} 
+                placeholder="Ex: Bela Vista" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-gray-300 font-medium">CEP</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.cep || form.zip || ''} 
+                onChange={e => setForm({...form, cep: e.target.value, zip: e.target.value})} 
+                placeholder="Ex: 01310-100" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-gray-300 font-medium">Cidade</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.cidade || form.city || ''} 
+                onChange={e => setForm({...form, cidade: e.target.value, city: e.target.value})} 
+                placeholder="Ex: São Paulo" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-gray-300 font-medium">Estado</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.estado || form.state || ''} 
+                onChange={e => setForm({...form, estado: e.target.value, state: e.target.value})} 
+                placeholder="Ex: SP" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1 col-span-2">
+              <label className="text-sm text-gray-300 font-medium">Horário de Funcionamento</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.business_hours || form.opening_hours || ''} 
+                onChange={e => setForm({...form, business_hours: e.target.value, opening_hours: e.target.value})} 
+                placeholder="Ex: Segunda à Sábado - 08h às 18h" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1 col-span-2">
+              <label className="text-sm text-gray-300 font-medium">Google Meu Negócio (Link de Compartilhamento do Maps)</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium text-xs" 
+                value={form.google_business_url || form.google_business_link || ''} 
+                onChange={e => setForm({...form, google_business_url: e.target.value, google_business_link: e.target.value})} 
+                placeholder="Ex: https://goo.gl/maps/..." 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-gray-300 font-medium font-sans">Instagram (Link completo ou usuário)</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.instagram || ''} 
+                onChange={e => setForm({...form, instagram: e.target.value})} 
+                placeholder="Ex: https://instagram.com/seu_perfil" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm text-gray-300 font-medium font-sans">Facebook (Link completo ou usuário)</label>
+              <input 
+                className="bg-gray-700 p-3 rounded text-white font-medium" 
+                value={form.facebook || ''} 
+                onChange={e => setForm({...form, facebook: e.target.value})} 
+                placeholder="Ex: https://facebook.com/seu_perfil" 
+              />
+            </div>
+          </div>
         </div>
 
         {/* Estatísticas editáveis */}
