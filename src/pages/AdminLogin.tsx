@@ -14,6 +14,12 @@ export default function AdminLogin() {
     setError('');
     setLoading(true);
 
+    if (!supabase) {
+      setError("O Supabase não está configurado. Verifique as chaves VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
+      setLoading(false);
+      return;
+    }
+
     if (!email) {
       alert("Informe o e-mail");
       setLoading(false);

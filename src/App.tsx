@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
+import { supabase } from './lib/supabase';
 import PageTracker from './components/PageTracker';
 import AdminLogin from './pages/AdminLogin';
 import AdminLayout from './components/AdminLayout';
@@ -19,7 +21,40 @@ import AdminHome from './pages/AdminHome';
 import AdminSettings from './pages/AdminSettings';
 import AdminGoogleAds from './pages/AdminGoogleAds';
 
+const DEFAULT_FAVICON = `data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="25" fill="#081A3A"/><path d="M50 15 L80 35 L80 65 L50 85 L20 65 L20 35 Z" fill="none" stroke="#00C853" stroke-width="8"/><text x="50" y="65" font-family="'Inter', sans-serif" font-weight="900" font-size="42" fill="white" text-anchor="middle">N</text></svg>`
+)}`;
+
 export default function App() {
+  useEffect(() => {
+    // Dynamically retrieve company logo for browser favicon
+    const updateFavicon = async () => {
+      let url = DEFAULT_FAVICON;
+      
+      if (supabase) {
+        try {
+          const { data } = await supabase.from('company_settings').select('logo_url').single();
+          if (data && data.logo_url) {
+            url = data.logo_url;
+          }
+        } catch (e) {
+          console.warn("Could not fetch brand logo for favicon:", e);
+        }
+      }
+
+      // Find or create favicon element
+      let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = url;
+    };
+
+    updateFavicon();
+  }, []);
+
   return (
     <BrowserRouter>
       <PageTracker />

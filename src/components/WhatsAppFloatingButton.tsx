@@ -4,12 +4,16 @@ import { MessageCircle } from 'lucide-react';
 import { trackEvent } from './TrackingScripts';
 
 export default function WhatsAppFloatingButton() {
-  const [whatsapp, setWhatsapp] = useState('');
+  const [whatsapp, setWhatsapp] = useState('5511999999999');
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.from('hero_section').select('whatsapp_number').single().then(({ data }) => {
-      if (data) setWhatsapp(data.whatsapp_number);
+    supabase.from('hero_section').select('whatsapp_number').single().then(({ data, error }) => {
+      if (!error && data && data.whatsapp_number) {
+        setWhatsapp(data.whatsapp_number);
+      }
+    }).catch(err => {
+      console.warn("Could not load WhatsApp number, using default of 5511999999999", err);
     });
   }, []);
 
@@ -21,7 +25,7 @@ export default function WhatsAppFloatingButton() {
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => trackEvent('whatsapp_click', { button: 'floating' })}
-      className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg z-[100] hover:scale-110 transition"
+      className="fixed bottom-6 right-6 bg-[#00C853] text-white p-4 rounded-full shadow-lg z-[100] hover:scale-110 hover:bg-[#00a846] transition duration-300"
     >
       <MessageCircle size={32} />
     </a>

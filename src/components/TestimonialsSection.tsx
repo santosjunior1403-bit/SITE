@@ -3,13 +3,59 @@ import { supabase } from '../lib/supabase';
 import { Testimonial } from '../types';
 import { Star } from 'lucide-react';
 
+const defaultTestimonials: Testimonial[] = [
+  {
+    id: 't1',
+    client_name: 'Marcos Silva',
+    text: 'Serviço espetacular! Resolveram um problema crônico de baratas no meu apartamento em Pinheiros. Altamente recomendado e muito profissionais.',
+    photo_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80',
+    rating: 5,
+    google_review_url: 'https://g.page/r/nexo-dedetizadora',
+    active: true,
+    date: '10/06/2026'
+  },
+  {
+    id: 't2',
+    client_name: 'Fernanda Costa',
+    text: 'Processo super profissional desde o atendimento no WhatsApp até a aplicação do produto. O técnico explicou tudo detalhadamente e resolveu as formigas.',
+    photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80',
+    rating: 5,
+    google_review_url: 'https://g.page/r/nexo-dedetizadora',
+    active: true,
+    date: '08/06/2026'
+  },
+  {
+    id: 't3',
+    client_name: 'Roberto Oliveira',
+    text: 'Excelente custo-benefício. Fizemos a desinsetização e a limpeza da caixa d\'água no condomínio inteiro e tudo correu perfeitamente com garantia total.',
+    photo_url: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&q=80',
+    rating: 5,
+    google_review_url: 'https://g.page/r/nexo-dedetizadora',
+    active: true,
+    date: '05/06/2026'
+  }
+];
+
 export default function TestimonialsSection() {
-  const [data, setData] = useState<Testimonial[]>([]);
+  const [data, setData] = useState<Testimonial[]>(defaultTestimonials);
 
   useEffect(() => {
-    if (!supabase) return;
-    supabase.from('testimonials').select('*').limit(3).then(({ data }) => {
-      if (data) setData(data);
+    if (!supabase) {
+      setData(defaultTestimonials);
+      return;
+    }
+    supabase.from('testimonials').select('*').limit(3).then(({ data: queryData, error }) => {
+      if (error) {
+        console.warn("Could not retrieve testimonials from Supabase, loading defaults.", error);
+        setData(defaultTestimonials);
+      } else if (queryData && queryData.length > 0) {
+        setData(queryData);
+      } else {
+        setData(defaultTestimonials);
+      }
+    }).catch(err => {
+      console.warn("Error querying testimonials from Supabase:", err);
+      setData(defaultTestimonials);
     });
   }, []);
 

@@ -53,7 +53,7 @@ export default function AdminLayout() {
              <Link to="/admin/clients" className="block text-gray-300 hover:text-white">Clientes/Parceiros</Link>
              <Link to="/admin/settings" className="block text-gray-300 hover:text-white">Configurações</Link>
              <Link to="/admin/google-ads" className="block text-gray-300 hover:text-white">Google Ads</Link>
-             <button onClick={async () => { await supabase.auth.signOut(); navigate('/admin/login'); }} className="text-red-400 mt-8 hover:text-red-300">Sair</button>
+             <button onClick={async () => { if (supabase) { await supabase.auth.signOut(); } navigate('/admin/login'); }} className="text-red-400 mt-8 hover:text-red-300">Sair</button>
         </nav>
       </aside>
       <main className="flex-1 p-8 bg-gray-950 text-white"><Outlet /></main>
