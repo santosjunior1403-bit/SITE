@@ -39,6 +39,7 @@ export default function Navbar() {
             <a href="#inicio" className="hover:text-[#00C853] transition-colors font-semibold">Início</a>
             <a href="#servicos" className="hover:text-[#00C853] transition-colors font-semibold">Serviços</a>
             <a href="#quem-somos" className="hover:text-[#00C853] transition-colors font-semibold">Quem Somos</a>
+            <a href="#faq" className="hover:text-[#00C853] transition-colors font-semibold">FAQ</a>
             
             <span className="h-6 w-[1.5px] bg-gray-200" />
             
@@ -75,6 +76,13 @@ export default function Navbar() {
             className="px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-800 transition-colors font-semibold text-base"
           >
             Quem Somos
+          </a>
+          <a 
+            href="#faq" 
+            onClick={() => setIsOpen(false)} 
+            className="px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-800 transition-colors font-semibold text-base"
+          >
+            FAQ
           </a>
           <hr className="border-gray-100" />
           <a 

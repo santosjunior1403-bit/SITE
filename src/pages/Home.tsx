@@ -7,6 +7,7 @@ import AboutUsSection from '../components/AboutUsSection';
 import PartnersSection from '../components/PartnersSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import BlogSection from '../components/BlogSection';
+import FAQ from '../components/FAQ';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
 import WhatsAppFloatingButton from '../components/WhatsAppFloatingButton';
@@ -50,6 +51,7 @@ export default function Home() {
         <PartnersSection />
         <TestimonialsSection />
         <BlogSection />
+        <FAQ />
         <ContactSection />
         <Footer />
         <WhatsAppFloatingButton />
