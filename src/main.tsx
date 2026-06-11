@@ -3,6 +3,12 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+
 const gaId = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 if (gaId) {
@@ -21,9 +27,3 @@ if (gaId) {
   gtag('js', new Date());
   gtag('config', gaId);
 }
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
