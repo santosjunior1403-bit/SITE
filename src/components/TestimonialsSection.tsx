@@ -7,6 +7,7 @@ export default function TestimonialsSection() {
   const [data, setData] = useState<Testimonial[]>([]);
 
   useEffect(() => {
+    if (!supabase) return;
     supabase.from('testimonials').select('*').limit(3).then(({ data }) => {
       if (data) setData(data);
     });

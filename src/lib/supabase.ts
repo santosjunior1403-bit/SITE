@@ -5,10 +5,10 @@ const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
 
 let client = null;
 
-if (supabaseUrl && supabaseAnonKey && !supabaseUrl.includes("seu-projeto") && !supabaseAnonKey.includes("sua-chave")) {
+if (supabaseUrl && supabaseAnonKey) {
   client = createClient(supabaseUrl, supabaseAnonKey);
 } else {
-  console.error("Supabase environment variables are missing or incorrectly configured.");
+  console.warn("Supabase environment variables are missing. Running without persistent database.");
 }
 
 export const supabase = client;

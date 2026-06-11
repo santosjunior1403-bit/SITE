@@ -21,6 +21,7 @@ export default function Footer() {
   });
 
   useEffect(() => {
+    if (!supabase) return;
     supabase.from('company_settings').select('*').single().then(({ data }) => {
       if (data) {
         setCompanyData({

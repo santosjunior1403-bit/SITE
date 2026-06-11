@@ -7,8 +7,9 @@ export default function Services() {
 
   useEffect(() => {
     async function fetchServices() {
-      const { data } = await supabase.from('services').select('*').eq('active', true).order('order');
-      if (data) setServices(data);
+        if (!supabase) return;
+        const { data } = await supabase.from('services').select('*').eq('active', true).order('order');
+        if (data) setServices(data);
     }
     fetchServices();
   }, []);

@@ -10,6 +10,7 @@ export default function StatsSection() {
   });
 
   useEffect(() => {
+    if (!supabase) return;
     supabase.from('company_settings').select('institutional_text').single().then(({ data }) => {
       if (data && data.institutional_text) {
         try {

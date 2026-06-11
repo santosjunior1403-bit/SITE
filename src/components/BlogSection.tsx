@@ -8,8 +8,9 @@ export default function BlogSection() {
 
   useEffect(() => {
     async function fetchPosts() {
-      const { data } = await supabase.from('blog_posts').select('*').eq('active', true).limit(3);
-      if (data) setPosts(data);
+        if (!supabase) return;
+        const { data } = await supabase.from('blog_posts').select('*').eq('active', true).limit(3);
+        if (data) setPosts(data);
     }
     fetchPosts();
   }, []);

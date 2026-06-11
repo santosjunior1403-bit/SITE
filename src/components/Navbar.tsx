@@ -7,6 +7,7 @@ export default function Navbar() {
   const [logo, setLogo] = useState('');
 
   useEffect(() => {
+    if (!supabase) return;
     supabase.from('company_settings').select('logo_url').single().then(({ data }) => {
       if (data) setLogo(data.logo_url);
     });

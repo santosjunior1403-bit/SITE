@@ -7,6 +7,7 @@ export default function WhatsAppFloatingButton() {
   const [whatsapp, setWhatsapp] = useState('');
 
   useEffect(() => {
+    if (!supabase) return;
     supabase.from('hero_section').select('whatsapp_number').single().then(({ data }) => {
       if (data) setWhatsapp(data.whatsapp_number);
     });

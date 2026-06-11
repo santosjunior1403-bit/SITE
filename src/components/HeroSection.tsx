@@ -10,6 +10,8 @@ export default function HeroSection() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    if (!supabase) return;
+    
     supabase.from('hero_section').select('*').single().then(({ data }) => {
       if (data) setData(data);
     });
