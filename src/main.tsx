@@ -6,19 +6,20 @@ import './index.css';
 const gaId = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 if (gaId) {
-  const script1 = document.createElement("script");
-  script1.async = true;
-  script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
-  document.head.appendChild(script1);
+  // Inject Google Analytics
+  const scriptTag = document.createElement("script");
+  scriptTag.async = true;
+  scriptTag.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+  document.head.appendChild(scriptTag);
 
-  const script2 = document.createElement("script");
-  script2.innerHTML = `
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '${gaId}');
-  `;
-  document.head.appendChild(script2);
+  // Initialize dataLayer
+  window.dataLayer = window.dataLayer || [];
+  function gtag(...args: any[]) {
+    window.dataLayer.push(args);
+  }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', gaId);
 }
 
 createRoot(document.getElementById('root')!).render(
