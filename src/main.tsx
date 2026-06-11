@@ -18,12 +18,12 @@ if (gaId) {
   scriptTag.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
   document.head.appendChild(scriptTag);
 
-  // Initialize dataLayer
+  // Initialize dataLayer safely
   window.dataLayer = window.dataLayer || [];
-  function gtag(...args: any[]) {
+  window.gtag = function(...args: any[]) {
     window.dataLayer.push(args);
-  }
-  window.gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', gaId);
+  };
+  
+  window.gtag('js', new Date());
+  window.gtag('config', gaId);
 }

@@ -14,6 +14,7 @@ export default function TrackingScripts() {
     const [settings, setSettings] = useState<GoogleAdsSettings | null>(null);
 
     useEffect(() => {
+        if (!supabase) return;
         supabase.from('google_ads_settings').select('*').single().then(({ data }) => {
             if (data && data.active) setSettings(data);
         });

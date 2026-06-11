@@ -12,6 +12,7 @@ import { supabase } from '../lib/supabase';
 
 export default function Home() {
   useEffect(() => {
+    if (!supabase) return;
     supabase.from('company_settings').select('company_name, name').single().then(({ data }) => {
       if (data) {
         const name = data.company_name || data.name || 'NEXO Dedetizadora';
