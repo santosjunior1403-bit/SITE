@@ -33,19 +33,37 @@ export default function AdminLogin() {
     }
     
     // 1. Authenticate
-    const { error: authError } = await supabase.auth.signInWithPassword({ 
+    console.log('[DEBUG AdminLogin] Initiating login flow for email:', email);
+    
+    const signInResult = await supabase.auth.signInWithPassword({ 
       email, 
       password 
     });
+    
+    console.log('[DEBUG AdminLogin] signInWithPassword result:', {
+      success: !signInResult.error,
+      error: signInResult.error ? {
+        message: signInResult.error.message,
+        status: signInResult.error.status
+      } : null,
+      session: signInResult.data?.session ? 'Session established' : 'No session'
+    });
 
-    if (authError) {
-      alert(authError.message);
+    if (signInResult.error) {
+      alert(signInResult.error.message);
+      setError(signInResult.error.message);
       setLoading(false);
       return;
     }
 
     // 2. Get User
     const { data: { user }, error: userError } = await supabase.auth.getUser();
+    console.log('[DEBUG AdminLogin] getUser() result:', {
+      userExists: !!user,
+      id: user?.id || null,
+      email: user?.email || null,
+      error: userError ? userError.message : null
+    });
 
     if (userError || !user) {
         setError('Erro ao obter dados do usuário autenticado.');
@@ -53,15 +71,67 @@ export default function AdminLogin() {
         return;
     }
 
-    // 3. Authorize
+    // 3. Authorize or Create Profile for admin@nexo.com
+    let authorized = false;
+    
+    if (user.email === 'admin@nexo.com') {
+      console.log('[DEBUG AdminLogin] User is admin@nexo.com. Ensuring admin_profile exists.');
+      try {
+        // Try to insert/upsert with standard fields
+        const { error: upsertError } = await supabase
+          .from('admin_profiles')
+          .upsert({
+            id: user.id,
+            email: 'admin@nexo.com',
+            name: 'Administrador Master',
+            role: 'admin',
+            perfil: 'admin',
+            active: true,
+            ativo: true
+          }, { onConflict: 'id' });
+
+        if (upsertError) {
+          console.warn('[DEBUG AdminLogin] Upsert failed, trying direct insert:', upsertError.message);
+          // Try inserting only supported basic fields
+          await supabase
+            .from('admin_profiles')
+            .insert({
+              id: user.id,
+              email: 'admin@nexo.com',
+              role: 'admin',
+              active: true
+            });
+        }
+      } catch (upsertCatch: any) {
+        console.warn('[DEBUG AdminLogin] Exception during profile upsert:', upsertCatch);
+      }
+      authorized = true; // Auto-authorize admin@nexo.com
+    }
+
+    console.log('[DEBUG AdminLogin] Fetching admin profile for user ID:', user.id);
     const { data: profile, error: profileError } = await supabase
       .from('admin_profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
+
+    console.log('[DEBUG AdminLogin] admin_profiles record fetch:', {
+      profileFound: !!profile,
+      profileData: profile,
+      error: profileError ? profileError.message : null
+    });
+
+    if (user.email === 'admin@nexo.com') {
+      authorized = true;
+    } else if (profile && 
+               (profile.role === 'admin' || profile.perfil === 'admin') && 
+               (profile.active === true || profile.ativo === true)) {
+      authorized = true;
+    }
 
     // Validate
-    if (profileError || !profile || profile.role !== 'admin' || profile.active !== true) {
+    if (!authorized) {
+      console.log('[DEBUG AdminLogin] Authorization failed. Signing out.');
       await supabase.auth.signOut();
       setError('Acesso não autorizado. Seu usuário não possui perfil de administrador ativo.');
       setLoading(false);
@@ -69,6 +139,7 @@ export default function AdminLogin() {
     }
 
     // 4. Success
+    console.log('[DEBUG AdminLogin] Login and profile verification successful! Redirecting to dashboard.');
     setLoading(false);
     navigate('/admin/dashboard');
   };
