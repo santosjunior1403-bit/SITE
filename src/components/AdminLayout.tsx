@@ -7,6 +7,11 @@ export default function AdminLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn("Supabase not initiated, cannot access admin panel.");
+      navigate('/admin/login');
+      return;
+    }
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
