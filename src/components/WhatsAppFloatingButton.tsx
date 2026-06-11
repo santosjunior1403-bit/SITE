@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { MessageCircle } from 'lucide-react';
+import { trackEvent } from './TrackingScripts';
 
 export default function WhatsAppFloatingButton() {
   const [whatsapp, setWhatsapp] = useState('');
@@ -18,6 +19,7 @@ export default function WhatsAppFloatingButton() {
       href={`https://wa.me/${whatsapp}?text=Olá! Gostaria de solicitar um orçamento.`}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackEvent('whatsapp_click', { button: 'floating' })}
       className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg z-[100] hover:scale-110 transition"
     >
       <MessageCircle size={32} />

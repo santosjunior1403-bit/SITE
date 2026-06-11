@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { HeroSection as HeroType } from '../types';
 import { Check, Zap, Award, Star, Users } from 'lucide-react';
+import { trackEvent } from './TrackingScripts';
 
 export default function HeroSection() {
   const [data, setData] = useState<HeroType | null>(null);
@@ -63,7 +64,9 @@ export default function HeroSection() {
           </div>
 
           <div className="flex flex-wrap gap-4 mb-10 justify-start">
-            <a href={`https://wa.me/${data.whatsapp_number}`} className="bg-[#00C853] text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold hover:bg-[#00a846] transition-all flex items-center gap-2 text-base md:text-lg">
+            <a href={`https://wa.me/${data.whatsapp_number}`} 
+               onClick={() => trackEvent('whatsapp_click', { button: 'hero' })} 
+               className="bg-[#00C853] text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold hover:bg-[#00a846] transition-all flex items-center gap-2 text-base md:text-lg">
                 <Users className="w-5 h-5 md:w-6 md:h-6" /> {data.button_text}
             </a>
           </div>
