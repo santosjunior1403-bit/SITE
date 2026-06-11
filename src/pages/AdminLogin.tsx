@@ -73,47 +73,70 @@ export default function AdminLogin() {
 
     // 3. Authorize or Create Profile for admin@nexo.com
     let authorized = false;
+    const isMasterAdmin = user.email?.toLowerCase() === 'admin@nexo.com';
     
-    if (user.email === 'admin@nexo.com') {
-      console.log('[DEBUG AdminLogin] User is admin@nexo.com. Ensuring admin_profile exists.');
+    if (isMasterAdmin) {
+      console.log('[DEBUG AdminLogin] User is master admin. Ensuring admin_profile exists.');
+      authorized = true; // Auto-authorize master admin regardless of db profile state
+      
       try {
-        // Try to insert/upsert with standard fields
-        const { error: upsertError } = await supabase
+        // Safe check and upsert for the profile.
+        // We do it asynchronously without blocking successful login in case of DB schema changes or table missing.
+        const profileData = {
+          id: user.id,
+          email: 'admin@nexo.com',
+          name: 'Administrador Master',
+          role: 'admin',
+          perfil: 'admin',
+          active: true,
+          ativo: true
+        };
+        
+        supabase
           .from('admin_profiles')
-          .upsert({
-            id: user.id,
-            email: 'admin@nexo.com',
-            name: 'Administrador Master',
-            role: 'admin',
-            perfil: 'admin',
-            active: true,
-            ativo: true
-          }, { onConflict: 'id' });
-
-        if (upsertError) {
-          console.warn('[DEBUG AdminLogin] Upsert failed, trying direct insert:', upsertError.message);
-          // Try inserting only supported basic fields
-          await supabase
-            .from('admin_profiles')
-            .insert({
-              id: user.id,
-              email: 'admin@nexo.com',
-              role: 'admin',
-              active: true
-            });
-        }
+          .upsert(profileData, { onConflict: 'id' })
+          .then(({ error: upsertError }) => {
+            if (upsertError) {
+              console.warn('[DEBUG AdminLogin] Upsert full fields failed, trying basic fields:', upsertError.message);
+              // Retry with safe basic fields in case 'perfil' or 'ativo' columns do not exist
+              supabase
+                .from('admin_profiles')
+                .upsert({
+                  id: user.id,
+                  email: 'admin@nexo.com',
+                  role: 'admin',
+                  active: true
+                }, { onConflict: 'id' })
+                .then(({ error: retryError }) => {
+                  if (retryError) {
+                    console.error('[DEBUG AdminLogin] Secondary upsert failed:', retryError.message);
+                  }
+                });
+            }
+          })
+          .catch(err => {
+            console.warn('[DEBUG AdminLogin] Async upsert error:', err);
+          });
       } catch (upsertCatch: any) {
         console.warn('[DEBUG AdminLogin] Exception during profile upsert:', upsertCatch);
       }
-      authorized = true; // Auto-authorize admin@nexo.com
     }
 
     console.log('[DEBUG AdminLogin] Fetching admin profile for user ID:', user.id);
-    const { data: profile, error: profileError } = await supabase
-      .from('admin_profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
+    let profile = null;
+    let profileError = null;
+    
+    try {
+      const response = await supabase
+        .from('admin_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+      profile = response.data;
+      profileError = response.error;
+    } catch (e: any) {
+      console.warn('[DEBUG AdminLogin] Query error on "admin_profiles":', e?.message || e);
+    }
 
     console.log('[DEBUG AdminLogin] admin_profiles record fetch:', {
       profileFound: !!profile,
@@ -121,11 +144,11 @@ export default function AdminLogin() {
       error: profileError ? profileError.message : null
     });
 
-    if (user.email === 'admin@nexo.com') {
+    if (isMasterAdmin) {
       authorized = true;
     } else if (profile && 
                (profile.role === 'admin' || profile.perfil === 'admin') && 
-               (profile.active === true || profile.ativo === true)) {
+               (profile.active === true || profile.ativo === true || profile.active === 1 || profile.ativo === 1)) {
       authorized = true;
     }
 

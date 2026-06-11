@@ -95,15 +95,11 @@ export default function HeroSection() {
               <span className="flex items-center gap-3 justify-start"><Award className="text-[#00C853]" /> GARANTIA <strong className="ml-1 text-[#00C853]">DE QUALIDADE</strong></span>
           </div>
 
-          <div className="flex flex-wrap gap-4 mb-10 justify-start">
+          <div className="flex mb-10 justify-start w-full sm:w-auto">
             <a href={`https://wa.me/${data.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(data.whatsapp_message || '')}`} 
                onClick={() => trackEvent('whatsapp_click', { button: 'hero' })} 
-               className="bg-[#00C853] text-white px-8 py-4 rounded-full font-bold hover:bg-[#00a846] transition-all flex items-center justify-center gap-2.5 text-base md:text-lg shadow-lg shadow-[#00C853]/25 group">
-                <MessageCircle className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" /> {data.button_text || 'Chamar no WhatsApp'}
-            </a>
-            <a href="#contato" 
-               className="bg-transparent text-white border-2 border-white/40 hover:border-[#00C853] hover:bg-white/5 px-8 py-4 rounded-full font-bold transition-all flex items-center justify-center text-base md:text-lg">
-                Agendar Orçamento
+               className="bg-[#00C853] text-white px-10 py-5 rounded-full font-black hover:bg-[#00a846] transition-all flex items-center justify-center gap-3 text-lg md:text-xl shadow-xl shadow-[#00C853]/35 group w-full sm:w-auto transform hover:scale-[1.02] duration-300">
+                <MessageCircle className="w-6 h-6 md:w-7 md:h-7 group-hover:scale-110 transition-transform" /> {data.button_text || 'Chamar no WhatsApp'}
             </a>
           </div>
           

@@ -19,22 +19,29 @@ export default function AdminLayout() {
         return;
       }
       
-      const userEmail = session.user.email;
+      const userEmail = session.user.email?.toLowerCase();
+      const isMasterAdmin = userEmail === 'admin@nexo.com';
       
-      const { data: profile } = await supabase
-        .from('admin_profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .maybeSingle();
+      let profile = null;
+      try {
+        const response = await supabase
+          .from('admin_profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
+        profile = response?.data || null;
+      } catch (e: any) {
+        console.warn("Could not query admin profile in layout checks:", e?.message || e);
+      }
         
       let isAuthorized = false;
-      if (userEmail === 'admin@nexo.com') {
+      if (isMasterAdmin) {
         isAuthorized = true;
         
         // Auto-recreate profile if it disappeared during checked state
         if (!profile) {
           try {
-            await supabase.from('admin_profiles').upsert({
+            supabase.from('admin_profiles').upsert({
               id: session.user.id,
               email: 'admin@nexo.com',
               name: 'Administrador Master',
@@ -42,7 +49,7 @@ export default function AdminLayout() {
               perfil: 'admin',
               active: true,
               ativo: true
-            });
+            }).catch(e => console.warn("Async auto-create admin profile failure:", e));
           } catch (e) {
             console.warn("Could not auto-create admin profile in layout checks:", e);
           }
