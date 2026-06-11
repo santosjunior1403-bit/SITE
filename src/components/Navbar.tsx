@@ -7,7 +7,10 @@ export default function Navbar() {
   const [logo, setLogo] = useState('');
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+        setLogo('https://via.placeholder.com/150');
+        return;
+    }
     supabase.from('company_settings').select('logo_url').single().then(({ data }) => {
       if (data) setLogo(data.logo_url);
     });

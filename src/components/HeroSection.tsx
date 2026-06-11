@@ -10,7 +10,24 @@ export default function HeroSection() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+        setData({
+          id: 'default',
+          logo_url: '',
+          title: 'Proteção Dedetizadora',
+          subtitle: 'Serviços de dedetização de alta qualidade para sua casa ou empresa. Proteção garantida e atendimento rápido.',
+          image_url: '',
+          button_text: 'Falar no WhatsApp',
+          whatsapp_number: '5511999999999',
+          phone: '',
+          email: '',
+          whatsapp_message: '',
+          banner_url: '',
+          primary_color: '#081A3A',
+          secondary_color: '#00C853'
+        });
+        return;
+    }
     
     supabase.from('hero_section').select('*').single().then(({ data }) => {
       if (data) setData(data);
