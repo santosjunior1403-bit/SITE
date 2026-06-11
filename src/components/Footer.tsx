@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Phone, Mail, MessageSquare, MapPin, Clock, Facebook, Instagram } from 'lucide-react';
+import { trackEvent } from './TrackingScripts';
 
 export default function Footer() {
   const [companyData, setCompanyData] = useState({
@@ -90,7 +91,9 @@ export default function Footer() {
                     <MessageSquare className="w-4 h-4 text-[#00C853] mt-1 shrink-0" />
                     <div>
                       <span className="font-semibold block text-white text-xs">WhatsApp</span>
-                      <span>{companyData.whatsapp}</span>
+                      <a href={`https://wa.me/${companyData.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors" onClick={() => trackEvent('whatsapp_click', { button: 'footer' })}>
+                        {companyData.whatsapp}
+                      </a>
                     </div>
                   </li>
                 )}
@@ -99,7 +102,9 @@ export default function Footer() {
                     <Phone className="w-4 h-4 text-blue-400 mt-1 shrink-0" />
                     <div>
                       <span className="font-semibold block text-white text-xs">Telefone</span>
-                      <span>{companyData.phone}</span>
+                      <a href={`tel:${companyData.phone.replace(/\D/g, '')}`} className="hover:text-blue-400 transition-colors" onClick={() => trackEvent('phone_click', { button: 'footer' })}>
+                        {companyData.phone}
+                      </a>
                     </div>
                   </li>
                 )}

@@ -6,6 +6,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
+import PageTracker from './components/PageTracker';
 import AdminLogin from './pages/AdminLogin';
 import AdminLayout from './components/AdminLayout';
 import AdminCompany from './pages/AdminCompany';
@@ -21,6 +22,7 @@ import AdminGoogleAds from './pages/AdminGoogleAds';
 export default function App() {
   return (
     <BrowserRouter>
+      <PageTracker />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blog/:id" element={<BlogPostPage />} />
