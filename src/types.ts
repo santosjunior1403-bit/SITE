@@ -18,6 +18,7 @@ export interface CompanySettings {
   free_quote_label?: string;
   free_quote_subtitle?: string;
   contact_center_label?: string;
+  about_banner_url?: string;
 }
 
 export interface HeroSection {
@@ -108,4 +109,15 @@ export interface GoogleAdsSettings {
   active: boolean;
   custom_head_code: string;
   custom_body_code: string;
+}
+
+export interface SiteBanner {
+  id: string;
+  banner_type: 'hero_desktop' | 'hero_mobile' | 'about_banner';
+  title?: string;
+  subtitle?: string;
+  image_url: string;
+  active?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }

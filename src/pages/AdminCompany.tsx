@@ -23,7 +23,8 @@ export default function AdminCompany() {
     business_hours: '',
     free_quote_label: '',
     free_quote_subtitle: '',
-    contact_center_label: ''
+    contact_center_label: '',
+    about_banner_url: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +47,7 @@ export default function AdminCompany() {
     }
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url') => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'about_banner_url') => {
     if (e.target.files && e.target.files[0]) {
       setLoading(true);
       try {
@@ -82,7 +83,8 @@ export default function AdminCompany() {
       business_hours: form.business_hours || '',
       free_quote_label: form.free_quote_label || '',
       free_quote_subtitle: form.free_quote_subtitle || '',
-      contact_center_label: form.contact_center_label || ''
+      contact_center_label: form.contact_center_label || '',
+      about_banner_url: form.about_banner_url || ''
     };
 
     try {
@@ -200,6 +202,25 @@ export default function AdminCompany() {
               type="file" 
               accept="image/*"
               onChange={(e) => handleUpload(e, 'logo_url')} 
+              className="bg-gray-700 p-3.5 rounded-xl text-gray-300 w-full text-sm outline-none file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#00C853] file:text-white hover:file:bg-[#00a846] cursor-pointer" 
+            />
+          </div>
+        </div>
+
+        {/* About Us Banner Upload */}
+        <div className="md:col-span-2 border-t border-gray-700/50 pt-6 mt-2">
+          <label className="block text-sm text-gray-300 font-semibold tracking-wide uppercase text-xs mb-3">Banner da Seção "Quem Somos"</label>
+          <p className="text-xs text-gray-400 mb-2">Ideal: imagem de técnicos em alta resolução, proporção aproximada de 4:3.</p>
+          <div className="flex flex-col gap-3">
+            {form.about_banner_url && (
+              <div className="p-2 bg-gray-900 rounded-xl border border-gray-700 max-w-sm overflow-hidden">
+                <img src={form.about_banner_url} alt="Banner Quem Somos" className="h-32 w-full object-cover rounded-lg" />
+              </div>
+            )}
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={(e) => handleUpload(e, 'about_banner_url')} 
               className="bg-gray-700 p-3.5 rounded-xl text-gray-300 w-full text-sm outline-none file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#00C853] file:text-white hover:file:bg-[#00a846] cursor-pointer" 
             />
           </div>

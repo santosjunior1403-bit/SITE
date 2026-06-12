@@ -33,12 +33,28 @@ export default function HeroSection() {
     }
     
     supabase.from('hero_section').select('*').single().then(({ data: queryData, error }) => {
-      if (!error && queryData) {
-        setData(queryData);
-      } else {
-        console.warn("Could not retrieve hero settings, loading defaults.", error);
-        setData(defaultHero);
-      }
+      let heroObj = queryData || defaultHero;
+      
+      // Load from site_banners dynamically
+      supabase.from('site_banners').select('*').then(({ data: banners }) => {
+        if (banners && Array.isArray(banners)) {
+          const desktop = banners.find((b: any) => b.banner_type === 'hero_desktop' && b.active !== false);
+          const mobile = banners.find((b: any) => b.banner_type === 'hero_mobile' && b.active !== false);
+          
+          let updatedHero = { ...heroObj };
+          if (desktop && desktop.image_url) {
+            updatedHero.image_url = desktop.image_url;
+          }
+          if (mobile && mobile.image_url) {
+            updatedHero.secondary_banner_url = mobile.image_url;
+          }
+          setData(updatedHero);
+        } else {
+          setData(heroObj);
+        }
+      }).catch(() => {
+        setData(heroObj);
+      });
     }).catch(err => {
       console.warn("Error loading hero from Supabase:", err);
       setData(defaultHero);

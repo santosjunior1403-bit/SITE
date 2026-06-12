@@ -1,6 +1,31 @@
+import { useState, useEffect } from 'react';
 import { Shield, Award, Sparkles, CheckCircle2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function AboutUsSection() {
+  const [bannerUrl, setBannerUrl] = useState('https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80');
+
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.from('site_banners').select('*').then(({ data }) => {
+      if (data && Array.isArray(data)) {
+        const aboutBanner = data.find((b: any) => b.banner_type === 'about_banner' && b.active !== false);
+        if (aboutBanner && aboutBanner.image_url) {
+          setBannerUrl(aboutBanner.image_url);
+          return;
+        }
+      }
+      // cascade fallback
+      supabase.from('company_settings').select('about_banner_url').single().then(({ data: compData }) => {
+        if (compData && compData.about_banner_url) {
+          setBannerUrl(compData.about_banner_url);
+        }
+      });
+    }).catch(err => {
+      console.warn("Could not load about banner, using fallback.", err);
+    });
+  }, []);
+
   return (
     <section id="quem-somos" className="py-24 bg-white text-gray-900 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,7 +36,7 @@ export default function AboutUsSection() {
             <div className="absolute -inset-1 bg-gradient-to-r from-[#081A3A] to-[#00C853] rounded-3xl blur opacity-25 group-hover:opacity-45 transition duration-1000"></div>
             <div className="relative bg-white rounded-3xl overflow-hidden aspect-[4/3] shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80" 
+                src={bannerUrl} 
                 alt="Técnico Dedetização NEXO" 
                 className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
               />

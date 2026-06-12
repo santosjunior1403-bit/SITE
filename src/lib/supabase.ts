@@ -23,6 +23,7 @@ const getFallbackData = (table: string): any => {
     seo_settings: 'nexo_seo_settings',
     clients: 'nexo_clients',
     admin_profiles: 'nexo_admin_profiles',
+    site_banners: 'nexo_site_banners',
   };
 
   const defaults: Record<string, any> = {
@@ -42,7 +43,8 @@ const getFallbackData = (table: string): any => {
       clients_attended: "+600",
       services_completed: "+1200",
       customer_satisfaction: "100%",
-      business_hours: "Segunda à Sábado - 08h às 18h"
+      business_hours: "Segunda à Sábado - 08h às 18h",
+      about_banner_url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80"
     },
     hero_section: {
       id: "fallback-hero-01",
@@ -200,7 +202,33 @@ const getFallbackData = (table: string): any => {
       google_analytics_id: "G-XXXXXXXXXX"
     },
     clients: [],
-    admin_profiles: []
+    admin_profiles: [],
+    site_banners: [
+      {
+        id: "banner-hero-desktop",
+        banner_type: "hero_desktop",
+        title: "Controle Profissional de Pragas Urbanas",
+        subtitle: "Protegendo sua família e seu patrimônio com agilidade, segurança e garantia.",
+        image_url: "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=1200",
+        active: true
+      },
+      {
+        id: "banner-hero-mobile",
+        banner_type: "hero_mobile",
+        title: "Controle Profissional de Pragas",
+        subtitle: "Protegendo sua família com agilidade e total segurança.",
+        image_url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80",
+        active: true
+      },
+      {
+        id: "banner-about",
+        banner_type: "about_banner",
+        title: "Quem Somos",
+        subtitle: "Nossa trajetória de dedicação.",
+        image_url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80",
+        active: true
+      }
+    ]
   };
 
   const key = localKeys[table];
@@ -233,6 +261,7 @@ const saveFallbackData = (table: string, payload: any, id?: string) => {
     seo_settings: 'nexo_seo_settings',
     clients: 'nexo_clients',
     admin_profiles: 'nexo_admin_profiles',
+    site_banners: 'nexo_site_banners',
   };
 
   const key = localKeys[table];
@@ -280,6 +309,7 @@ const deleteFallbackData = (table: string, id: string) => {
     seo_settings: 'nexo_seo_settings',
     clients: 'nexo_clients',
     admin_profiles: 'nexo_admin_profiles',
+    site_banners: 'nexo_site_banners',
   };
 
   const key = localKeys[table];
@@ -295,11 +325,14 @@ const deleteFallbackData = (table: string, id: string) => {
 
 // ---------------- DATABASE SCHEMAS DEFINITIONS FOR SANITIZATION & NORMALIZATION ----------------
 const ALLOWED_COLUMNS: Record<string, string[]> = {
+  site_banners: [
+    'id', 'banner_type', 'title', 'subtitle', 'image_url', 'active', 'created_at', 'updated_at'
+  ],
   company_settings: [
     'id', 'company_name', 'logo_url', 'phone', 'email', 'address', 'city',
     'state', 'cep', 'instagram_url', 'facebook_url', 'google_business_url',
     'clients_attended', 'services_completed', 'customer_satisfaction', 'business_hours',
-    'free_quote_label', 'free_quote_subtitle', 'contact_center_label'
+    'free_quote_label', 'free_quote_subtitle', 'contact_center_label', 'about_banner_url'
   ],
   hero_section: [
     'id', 'title', 'subtitle', 'image_url', 'active', 'created_at', 'secondary_banner_url', 'button_text',
