@@ -4,7 +4,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 // Output the exact Supabase URL to the console per user requirements
-console.log('SUPABASE_URL usado em produção:', supabaseUrl);
+console.log('VITE_SUPABASE_URL usada em produção:', import.meta.env.VITE_SUPABASE_URL);
 
 const projectRef = supabaseUrl ? (supabaseUrl.includes('//') ? supabaseUrl.split('//')[1]?.split('.')[0] : 'Desconhecido') : 'Desconhecido';
 
@@ -406,7 +406,9 @@ const sanitizeAndSavePayload = (tableName: string, originalPayload: any): any =>
   if (!originalPayload) return originalPayload;
   
   // 1. Save completely to localStorage so client features are 100% intact
-  saveFallbackData(tableName, originalPayload, originalPayload.id);
+  if (tableName !== 'company_settings') {
+    saveFallbackData(tableName, originalPayload, originalPayload.id);
+  }
 
   // 2. If we don't have constraints defined, send as is
   const allowed = ALLOWED_COLUMNS[tableName];
@@ -492,8 +494,11 @@ const normalizeOutputData = (tableName: string, data: any): any => {
   return normalizeRow(data);
 };
 
-function isTableNotExistError(error: any): boolean {
+function isTableNotExistError(error: any, tableName?: string): boolean {
   if (!error) return false;
+  if (tableName === 'company_settings') {
+    return false;
+  }
   const message = error.message || '';
   const code = error.code || '';
   
@@ -566,7 +571,7 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
 
           const realPromise = target;
           return realPromise.then((result: any) => {
-            if (result.error && isTableNotExistError(result.error)) {
+            if (result.error && isTableNotExistError(result.error, tableName)) {
               console.warn(`[SUPABASE PROXY] Table "${tableName}" requested failed (non-existent error):`, result.error.message);
               console.log(`[SUPABASE PROXY] Deploying fallback for table "${tableName}"...`);
               
@@ -602,6 +607,10 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
             // If success, enrich the returned data with normalized fields
             if (result.data) {
               result.data = normalizeOutputData(tableName, result.data);
+              // Save to fallback storage upon actual successful remote database transaction
+              if (tableName === 'company_settings' && (mode === 'insert' || mode === 'update' || mode === 'upsert')) {
+                saveFallbackData(tableName, result.data, updateId || result.data?.id || payload?.id);
+              }
             }
             return resolve(result);
           }).catch((err: any) => {
