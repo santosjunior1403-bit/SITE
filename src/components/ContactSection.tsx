@@ -16,7 +16,10 @@ export default function ContactSection() {
   const [companySettings, setCompanySettings] = useState({
     phone: '(11) 4003-9128',
     email: 'contato@nexodedetizadora.com.br',
-    business_hours: 'Segunda a Sábado — 08:00 às 18:00'
+    business_hours: 'Segunda a Sábado — 08:00 às 18:00',
+    free_quote_label: 'Orçamento Gratuito',
+    free_quote_subtitle: 'Nossa equipe técnica comercial está pronta para atender o seu chamado com agilidade e total eficiência.',
+    contact_center_label: 'Central de Atendimento'
   });
 
   useEffect(() => {
@@ -32,12 +35,15 @@ export default function ContactSection() {
     });
 
     // Fetch phone, email, business_hours from company_settings
-    supabase.from('company_settings').select('phone, email, business_hours').single().then(({ data }) => {
+    supabase.from('company_settings').select('*').single().then(({ data }) => {
       if (data) {
         setCompanySettings({
           phone: data.phone || '(11) 4003-9128',
           email: data.email || 'contato@nexodedetizadora.com.br',
-          business_hours: data.business_hours || 'Segunda a Sábado — 08:00 às 18:00'
+          business_hours: data.business_hours || 'Segunda a Sábado — 08:00 às 18:00',
+          free_quote_label: data.free_quote_label || 'Orçamento Gratuito',
+          free_quote_subtitle: data.free_quote_subtitle || 'Nossa equipe técnica comercial está pronta para atender o seu chamado com agilidade e total eficiência.',
+          contact_center_label: data.contact_center_label || 'Central de Atendimento'
         });
       }
     }).catch(err => {
@@ -65,10 +71,10 @@ export default function ContactSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-4xl font-extrabold text-[#081A3A] tracking-tight mb-4">
-            Solicite um <span className="text-[#00C853]">Orçamento Gratuito</span>
+            Solicite um <span className="text-[#00C853]">{companySettings.free_quote_label || 'Orçamento Gratuito'}</span>
           </h2>
           <p className="text-gray-600 text-lg">
-            Nossa equipe técnica comercial está pronta para atender o seu chamado com agilidade e total eficiência.
+            {companySettings.free_quote_subtitle || 'Nossa equipe técnica comercial está pronta para atender o seu chamado com agilidade e total eficiência.'}
           </p>
         </div>
 
@@ -95,10 +101,10 @@ export default function ContactSection() {
 
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-white/5 rounded-xl text-blue-400 shrink-0">
-                    <Phone className="w-6 h-6" />
+                     <Phone className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-blue-400 text-sm">Central de Atendimento</h4>
+                    <h4 className="font-semibold text-blue-400 text-sm">{companySettings.contact_center_label || 'Central de Atendimento'}</h4>
                     <p className="text-white font-medium block mt-1">{companySettings.phone}</p>
                   </div>
                 </div>

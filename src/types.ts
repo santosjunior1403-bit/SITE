@@ -15,6 +15,9 @@ export interface CompanySettings {
   services_completed: string;
   customer_satisfaction: string;
   business_hours: string;
+  free_quote_label?: string;
+  free_quote_subtitle?: string;
+  contact_center_label?: string;
 }
 
 export interface HeroSection {
@@ -32,6 +35,9 @@ export interface HeroSection {
   secondary_banner_url?: string | null;
   primary_color: string;
   secondary_color: string;
+  free_quote_label?: string;
+  free_quote_subtitle?: string;
+  contact_center_label?: string;
 }
 
 export interface Service {
@@ -61,6 +67,7 @@ export interface BlogPost {
   featured: boolean;
   active: boolean;
   order: number;
+  slug?: string;
 }
 
 export interface Testimonial {

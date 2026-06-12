@@ -98,11 +98,92 @@ const getFallbackData = (table: string): any => {
     blog_posts: [
       {
         id: "blog-01",
-        title: "Como evitar baratas no outono",
-        content: "Neste artigo ensinamos as melhores práticas para manter seu lar livre de baratas durante o outono...",
-        excerpt: "Dicas essenciais para o controle preventivo de baratas em residências.",
+        title: "Como saber se sua casa precisa de dedetização",
+        slug: "como-saber-se-sua-casa-precisa-de-dedetizacao",
+        subtitle: "Sinais claros de que é hora de chamar um especialista",
+        summary: "Saiba identificar os principais vestígios de insetos e animais peçonhentos no seu imóvel antes que se torne uma infestação crítica.",
+        content: "Muitas vezes, a necessidade de dedetização só é percebida quando a infestação já está em um estágio crítico. Mas, antes de avistar as pragas de forma frequente, é possível identificar pequenos sinais sutis de que seu lar precisa de socorro técnico.\n\nSinais Comuns de Alerta:\n- Pequenas fezes ou resíduos granulados nos cantos dos armários e no chão.\n- Odores estranhos, adocicados ou de mofo persistente, característicos de baratas.\n- Barulhos estranhos no teto ou nas frestas das paredes durante o período noturno.\n- Móveis e rodapés de madeira que apresentam furos de agulha ou resíduos de pó que simbolizam a presença de cupins.\n\nContratar um serviço especializado garante a higienização do local com produtos sem odor, seguros para crianças e animais de estimação, agindo nos focos principais das infestações antes que virem um grave problema de saúde.",
+        category: "Prevenção",
+        author: "NEXO Dedetizadora",
+        main_image_url: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=600&q=80",
+        image_url: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=600&q=80",
         active: true,
-        image_url: "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=600",
+        published: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "blog-02",
+        title: "Controle de baratas: riscos e prevenção",
+        slug: "controle-de-baratas-riscos-e-prevencao",
+        subtitle: "Como afastar essa praga e proteger sua saúde",
+        summary: "Descubra os graves riscos à saúde que as baratas trazem e quais as medidas ideais de prevenção residencial.",
+        content: "As baratas são pragas altamente adaptáveis e portadoras de diversas patógenos causadores de diarreia, hepatite A, febre tifoide e alergias respiratórias graves. Elas trafegam por esgotos e superfícies imundas, trazendo para dentro das residências microrganismos nocivos.\n\nComo Prevenir:\n- Mantenha ralos limpos e use grelhas com fechamento.\n- Nunca armazene lixeiras destampadas ou resíduos alimentares abertos.\n- Invista em barreiras de borracha sob as portas externas.\n\nPara infestações ativas, os sprays aerosol comuns geralmente apenas dispersam as colônias sem eliminá-las por completo. A desinsetização profissional com aplicação de gel de alta atração e micropulverização direcionada é o único método capaz de exterminar as baratas no centro de sua colônia de forma definitiva e segura.",
+        category: "Saúde",
+        author: "NEXO Dedetizadora",
+        main_image_url: "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&w=600&q=80",
+        image_url: "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&w=600&q=80",
+        active: true,
+        published: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "blog-03",
+        title: "Controle de ratos: proteção para residências e empresas",
+        slug: "controle-de-ratos-protecao-para-residencias-e-empresas",
+        subtitle: "Mantenha os roedores longe do seu patrimônio",
+        summary: "Ratos representam grandes riscos biológicos e estruturais. Veja como manter seu patrimônio e saúde perfeitamente seguros.",
+        content: "Ratos de telhado, ratazanas e camundongos são animais extremamente inteligentes, capazes de roer fiação elétrica, canos de PVC e provocar graves curtos-circuitos ou incidentes, além de transmitir leptospirose pela urina.\n\nMedidas de Proteção:\n- Evite deixar comedouros de animais de estimação expostos com comida à noite.\n- Faça a correta vedação de aberturas de ventilação com telas metálicas de malha fina.\n- Recolha folhas secas, entulhos e lixo doméstico no quintal.\n\nA desratização profissional da NEXO consiste no mapeamento inteligente, instalação de caixas de monitoramento portas-iscas seguras e lacradas (impedindo o contato acidental de pets ou crianças), com monitoramento ativo até o controle total dos roedores.",
+        category: "Proteção",
+        author: "NEXO Dedetizadora",
+        main_image_url: "https://images.unsplash.com/photo-1473186578172-c141e6798cf4?auto=format&fit=crop&w=600&q=80",
+        image_url: "https://images.unsplash.com/photo-1473186578172-c141e6798cf4?auto=format&fit=crop&w=600&q=80",
+        active: true,
+        published: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "blog-04",
+        title: "Cupins: como identificar antes do prejuízo",
+        slug: "cupins-como-identificar-antes-do-prejuizo",
+        subtitle: "Ação silenciosa da pior ameaça para madeiras e móveis",
+        summary: "O ataque de cupins pode destruir a mobília e a estrutura de madeira da sua propriedade de forma silenciosa. Aprenda a agir rápido.",
+        content: "Diferente de outras pragas, os cupins de madeira seca ou subterrâneos destroem as celuloses de dentro para fora, mantendo a camada externa da madeira intacta. Quando o dano se torna visível em um armário ou porta, o prejuízo financeiro já pode ser gigantesco.\n\nIndícios de Infestação:\n- Acúmulo de esferas duras e minúsculas de pó (fezes de cupins de madeira).\n- Caminhos ou túneis avermelhados de terra subindo por rodapés, paredes ou vigas.\n- Presença de siriris ou aleluias (cupins com asas) rodeando lâmpadas à noite.\n\nA descupinização profissional da NEXO utiliza barreira química protetora e injeção de calda cupinicida diretamente nos veios infestados, garantindo a eliminação completa da rainha e proteção duradoura por até 5 anos.",
+        category: "Segurança",
+        author: "NEXO Dedetizadora",
+        main_image_url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80",
+        image_url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80",
+        active: true,
+        published: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "blog-05",
+        title: "Limpeza de caixa d’água: por que fazer periodicamente",
+        slug: "limpeza-de-caixa-dagua-por-que-fazer-periodicamente",
+        subtitle: "Água saudável e de qualidade para toda a família",
+        summary: "Entenda por que a higienização a cada seis meses protege contra contaminações sérias de patógenos na água de consumo.",
+        content: "O reservatório de água do seu imóvel acumula poeira, lodo, folhas e insetos mortos que decantam ao longo do tempo. Esse acúmulo gera uma espessa camada de matéria orgânica no fundo, propiciando o crescimento acelerado de vírus e bactérias agressivas.\n\nPor que Limpar de 6 em 6 meses:\n- Evita contaminações microbiológicas que provocam vômitos e infecções intestinais.\n- Garante purificação ideal de escovação dentária e preparo de alimentos.\n- Previne a proliferação do mosquito transmissor da Dengue, Zika e Chikungunya, caso a tampa rache ou desloque.\n\nA NEXO realiza a desinfecção residencial e predial com bactericidas regulamentados pela ANVISA, fornecendo laudo de potabilidade e garantia de qualidade na reservação.",
+        category: "Higiene",
+        author: "NEXO Dedetizadora",
+        main_image_url: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
+        image_url: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
+        active: true,
+        published: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "blog-06",
+        title: "Dedetização em empresas e condomínios",
+        slug: "dedetizacao-em-empresas-e-condominios",
+        subtitle: "Sua empresa em conformidade com as normas sanitárias",
+        summary: "A importância das dedetizações preventivas periódicas para a regularidade sanitária e fiscal em condomínios e indústrias.",
+        content: "Para indústrias, comércios do ramo alimentício e condomínios residenciais ou corporativos, a dedetização não é opcional, mas uma exigência legal fiscalizada de perto pela Vigilância Sanitária (CVS/ANVISA).\n\nVantagens do Controle de Pragas Programado:\n- Certificação técnica e laudos prontos para auditorias e fiscalizações.\n- Manutenção de ambientes saudáveis e aumento do bem-estar na convivência.\n- Proteção contra prejuízos reputacionais imprevistos causados por pragas em áreas comuns.\n\nA NEXO desenvolve cronogramas personalizados pós-agendamento e emite todos os relatórios operacionais exigíveis por lei para controle de vetores.",
+        category: "Corporativo",
+        author: "NEXO Dedetizadora",
+        main_image_url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80",
+        image_url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80",
+        active: true,
+        published: true,
         created_at: new Date().toISOString()
       }
     ],
@@ -217,10 +298,12 @@ const ALLOWED_COLUMNS: Record<string, string[]> = {
   company_settings: [
     'id', 'company_name', 'logo_url', 'phone', 'email', 'address', 'city',
     'state', 'cep', 'instagram_url', 'facebook_url', 'google_business_url',
-    'clients_attended', 'services_completed', 'customer_satisfaction', 'business_hours'
+    'clients_attended', 'services_completed', 'customer_satisfaction', 'business_hours',
+    'free_quote_label', 'free_quote_subtitle', 'contact_center_label'
   ],
   hero_section: [
-    'id', 'title', 'subtitle', 'image_url', 'active', 'created_at'
+    'id', 'title', 'subtitle', 'image_url', 'active', 'created_at', 'secondary_banner_url', 'button_text',
+    'whatsapp_number', 'free_quote_label', 'free_quote_subtitle', 'contact_center_label'
   ],
   blog_posts: [
     'id', 'title', 'slug', 'content', 'image_url', 'published', 'created_at'

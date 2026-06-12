@@ -20,7 +20,10 @@ export default function AdminCompany() {
     clients_attended: '',
     services_completed: '',
     customer_satisfaction: '',
-    business_hours: ''
+    business_hours: '',
+    free_quote_label: '',
+    free_quote_subtitle: '',
+    contact_center_label: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -76,7 +79,10 @@ export default function AdminCompany() {
       clients_attended: form.clients_attended || '',
       services_completed: form.services_completed || '',
       customer_satisfaction: form.customer_satisfaction || '',
-      business_hours: form.business_hours || ''
+      business_hours: form.business_hours || '',
+      free_quote_label: form.free_quote_label || '',
+      free_quote_subtitle: form.free_quote_subtitle || '',
+      contact_center_label: form.contact_center_label || ''
     };
 
     try {
@@ -241,6 +247,42 @@ export default function AdminCompany() {
                 value={form.facebook_url || ''} 
                 onChange={e => setForm({...form, facebook_url: e.target.value})} 
                 placeholder="Ex: https://facebook.com/nexodedetizadora" 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Textos Personalizados do Site */}
+        <div className="md:col-span-2 border-t border-gray-700/50 pt-6 mt-2 font-sans">
+          <h3 className="text-base font-bold text-[#00C853] tracking-wide uppercase mb-4">Textos Personalizados do Canal de Contato</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5 col-span-2">
+              <label className="text-sm text-gray-300 font-semibold tracking-wide uppercase text-xs">Texto Destacado do Orçamento (Ex: Orçamento Gratuito)</label>
+              <input 
+                className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm" 
+                value={form.free_quote_label || ''} 
+                onChange={e => setForm({...form, free_quote_label: e.target.value})} 
+                placeholder="Ex: Orçamento Gratuito" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5 col-span-2">
+              <label className="text-sm text-gray-300 font-semibold tracking-wide uppercase text-xs">Subtítulo explicativo do canal de contato</label>
+              <input 
+                className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm" 
+                value={form.free_quote_subtitle || ''} 
+                onChange={e => setForm({...form, free_quote_subtitle: e.target.value})} 
+                placeholder="Ex: Nossa equipe técnica está pronta para atender o seu chamado com agilidade..." 
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5 col-span-2">
+              <label className="text-sm text-gray-300 font-semibold tracking-wide uppercase text-xs">Texto para Central de Atendimento (Ex: Central de Atendimento)</label>
+              <input 
+                className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm" 
+                value={form.contact_center_label || ''} 
+                onChange={e => setForm({...form, contact_center_label: e.target.value})} 
+                placeholder="Ex: Central de Atendimento" 
               />
             </div>
           </div>
