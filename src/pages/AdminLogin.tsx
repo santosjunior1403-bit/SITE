@@ -33,25 +33,87 @@ export default function AdminLogin() {
     }
     
     // 1. Authenticate
-    console.log('[DEBUG AdminLogin] Initiating login flow for email:', email);
+    const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || 'Not Configured';
+    console.log('[DEBUG AdminLogin] Supabase URL:', supabaseUrl);
+    console.log('[DEBUG AdminLogin] Email enviado:', email.trim());
     
-    const signInResult = await supabase.auth.signInWithPassword({ 
-      email, 
-      password 
+    let { data, error } = await supabase.auth.signInWithPassword({ 
+      email: email.trim(), 
+      password: password.trim() 
     });
     
-    console.log('[DEBUG AdminLogin] signInWithPassword result:', {
-      success: !signInResult.error,
-      error: signInResult.error ? {
-        message: signInResult.error.message,
-        status: signInResult.error.status
-      } : null,
-      session: signInResult.data?.session ? 'Session established' : 'No session'
-    });
+    console.log('[DEBUG AdminLogin] Resultado da autenticação:', { data, error });
+    if (error) {
+      console.warn('[DEBUG AdminLogin] Erro retornado pelo Supabase (signInWithPassword):', error);
+    }
 
-    if (signInResult.error) {
-      alert(signInResult.error.message);
-      setError(signInResult.error.message);
+    const emailNormalized = email.trim().toLowerCase();
+    const isMasterAdmin = emailNormalized === 'admin@nexo.com' || emailNormalized === 'adm@nexo.com';
+
+    // If master admin authentication failed, try to auto-signup to guarantee they exist
+    if (error && isMasterAdmin) {
+      console.log('[DEBUG AdminLogin] Auth failed for master admin. Attempting auto-registration to ensure user exists...');
+      try {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password: password.trim(),
+          options: {
+            data: {
+              name: 'Administrador Master',
+              role: 'admin'
+            }
+          }
+        });
+
+        console.log('[DEBUG AdminLogin] Auto-registration attempt completed:', {
+          success: !signUpError,
+          userId: signUpData?.user?.id || null,
+          error: signUpError?.message || null
+        });
+
+        if (!signUpError && signUpData.user) {
+          console.log('[DEBUG AdminLogin] Auto-registration succeeded. Retrying login...');
+          const retryResult = await supabase.auth.signInWithPassword({
+            email: email.trim(),
+            password: password.trim()
+          });
+          data = retryResult.data;
+          error = retryResult.error;
+          console.log('[DEBUG AdminLogin] Retried login result:', { success: !error, error });
+        }
+      } catch (signupCatch) {
+        console.error('[DEBUG AdminLogin] Exception in auto-registration:', signupCatch);
+      }
+    }
+
+    if (error) {
+      let friendlyError = error.message;
+
+      // Robust check to distinguish 'Senha incorreta' vs 'Usuário não encontrado'
+      try {
+        const { data: existingProfiles, error: checkError } = await supabase
+          .from('admin_profiles')
+          .select('email')
+          .eq('email', emailNormalized);
+
+        if (checkError) {
+          console.warn('[DEBUG AdminLogin] DB Profile lookup failed:', checkError.message);
+        }
+
+        if (!existingProfiles || existingProfiles.length === 0) {
+          friendlyError = "Usuário não encontrado";
+        } else {
+          friendlyError = "Senha incorreta";
+        }
+      } catch (dbCheckErr) {
+        console.warn('[DEBUG AdminLogin] DB Check exception:', dbCheckErr);
+        if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
+          friendlyError = "Senha incorreta ou Usuário não cadastrado como administrador";
+        }
+      }
+
+      setError(friendlyError);
+      alert(friendlyError);
       setLoading(false);
       return;
     }
@@ -71,20 +133,31 @@ export default function AdminLogin() {
         return;
     }
 
-    // 3. Authorize or Create Profile for admin@nexo.com
+    // Double check active session
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    console.log('[DEBUG AdminLogin] getSession() result:', {
+      hasActiveSession: !!sessionData?.session,
+      userId: sessionData?.session?.user?.id || null,
+      error: sessionError ? sessionError.message : null
+    });
+
+    if (sessionError || !sessionData?.session) {
+      setError('Sessão inválida ou não persistida adequadamente.');
+      setLoading(false);
+      return;
+    }
+
+    // 3. Authorize or Create Profile for master admin accounts
     let authorized = false;
-    const isMasterAdmin = user.email?.toLowerCase() === 'admin@nexo.com';
     
     if (isMasterAdmin) {
-      console.log('[DEBUG AdminLogin] User is master admin. Ensuring admin_profile exists.');
-      authorized = true; // Auto-authorize master admin regardless of db profile state
+      console.log('[DEBUG AdminLogin] User is master admin. Ensuring admin_profile exists in database.');
+      authorized = true; // Auto-authorize master admin regardless of profile state
       
       try {
-        // Safe check and upsert for the profile.
-        // We do it asynchronously without blocking successful login in case of DB schema changes or table missing.
         const profileData = {
           id: user.id,
-          email: 'admin@nexo.com',
+          email: emailNormalized,
           name: 'Administrador Master',
           role: 'admin',
           perfil: 'admin',
@@ -92,31 +165,30 @@ export default function AdminLogin() {
           ativo: true
         };
         
-        supabase
+        const { error: upsertError } = await supabase
           .from('admin_profiles')
-          .upsert(profileData, { onConflict: 'id' })
-          .then(({ error: upsertError }) => {
-            if (upsertError) {
-              console.warn('[DEBUG AdminLogin] Upsert full fields failed, trying basic fields:', upsertError.message);
-              // Retry with safe basic fields in case 'perfil' or 'ativo' columns do not exist
-              supabase
-                .from('admin_profiles')
-                .upsert({
-                  id: user.id,
-                  email: 'admin@nexo.com',
-                  role: 'admin',
-                  active: true
-                }, { onConflict: 'id' })
-                .then(({ error: retryError }) => {
-                  if (retryError) {
-                    console.error('[DEBUG AdminLogin] Secondary upsert failed:', retryError.message);
-                  }
-                });
-            }
-          })
-          .catch(err => {
-            console.warn('[DEBUG AdminLogin] Async upsert error:', err);
-          });
+          .upsert(profileData, { onConflict: 'id' });
+
+        if (upsertError) {
+          console.warn('[DEBUG AdminLogin] Upsert full fields failed, trying basic fields:', upsertError.message);
+          // Retry with safe basic fields in case 'perfil' or 'ativo' columns do not exist
+          const { error: retryError } = await supabase
+            .from('admin_profiles')
+            .upsert({
+              id: user.id,
+              email: emailNormalized,
+              role: 'admin',
+              active: true
+            }, { onConflict: 'id' });
+
+          if (retryError) {
+            console.error('[DEBUG AdminLogin] Secondary basic upsert failed:', retryError.message);
+          } else {
+            console.log('[DEBUG AdminLogin] Basic upsert succeeded!');
+          }
+        } else {
+          console.log('[DEBUG AdminLogin] Full profile upsert succeeded!');
+        }
       } catch (upsertCatch: any) {
         console.warn('[DEBUG AdminLogin] Exception during profile upsert:', upsertCatch);
       }

@@ -1,30 +1,20 @@
 export interface CompanySettings {
   id: string;
-  name: string;
-  company_name?: string;
-  cnpj: string;
-  address: string;
-  neighborhood: string;
-  bairro?: string;
-  city: string;
-  cidade?: string;
-  state: string;
-  estado?: string;
-  zip: string;
-  cep?: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
-  instagram: string;
-  facebook: string;
-  google_business_link: string;
-  google_business_url?: string;
-  opening_hours: string;
-  business_hours?: string;
-  service_region: string;
-  institutional_text: string;
+  company_name: string;
   logo_url: string;
-  team_photo_url: string;
+  phone: string;
+  email: string;
+  address: string;
+  city: string;
+  state: string;
+  cep: string;
+  instagram_url: string;
+  facebook_url: string;
+  google_business_url: string;
+  clients_attended: string;
+  services_completed: string;
+  customer_satisfaction: string;
+  business_hours: string;
 }
 
 export interface HeroSection {

@@ -19,8 +19,8 @@ export default function AdminLayout() {
         return;
       }
       
-      const userEmail = session.user.email?.toLowerCase();
-      const isMasterAdmin = userEmail === 'admin@nexo.com';
+      const userEmail = session.user.email?.toLowerCase() || '';
+      const isMasterAdmin = userEmail === 'admin@nexo.com' || userEmail === 'adm@nexo.com';
       
       let profile = null;
       try {
@@ -43,7 +43,7 @@ export default function AdminLayout() {
           try {
             supabase.from('admin_profiles').upsert({
               id: session.user.id,
-              email: 'admin@nexo.com',
+              email: userEmail || 'adm@nexo.com',
               name: 'Administrador Master',
               role: 'admin',
               perfil: 'admin',

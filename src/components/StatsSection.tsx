@@ -11,20 +11,13 @@ export default function StatsSection() {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.from('company_settings').select('institutional_text').single().then(({ data }) => {
-      if (data && data.institutional_text) {
-        try {
-          const parsed = JSON.parse(data.institutional_text);
-          if (parsed && typeof parsed === 'object') {
-            setStatsData({
-              clientes_atendidos: parsed.clientes_atendidos || '+500',
-              servicos_realizados: parsed.servicos_realizados || '+1000',
-              clientes_satisfeitos: parsed.clientes_satisfeitos || '100%'
-            });
-          }
-        } catch (e) {
-          console.error("Error parsing stats data", e);
-        }
+    supabase.from('company_settings').select('clients_attended, services_completed, customer_satisfaction').single().then(({ data, error }) => {
+      if (!error && data) {
+        setStatsData({
+          clientes_atendidos: data.clients_attended || '+500',
+          servicos_realizados: data.services_completed || '+1000',
+          clientes_satisfeitos: data.customer_satisfaction || '100%'
+        });
       }
     });
   }, []);

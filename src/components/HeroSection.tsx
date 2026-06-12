@@ -44,16 +44,9 @@ export default function HeroSection() {
       setData(defaultHero);
     });
 
-    supabase.from('company_settings').select('institutional_text').single().then(({ data: statsData, error }) => {
-      if (!error && statsData && statsData.institutional_text) {
-        try {
-          const parsed = JSON.parse(statsData.institutional_text);
-          if (parsed && typeof parsed === 'object') {
-            setSatisfiedCount(parsed.clientes_atendidos || '+500');
-          }
-        } catch (e) {
-          console.error("Error parsing stats", e);
-        }
+    supabase.from('company_settings').select('clients_attended').single().then(({ data: statsData, error }) => {
+      if (!error && statsData && statsData.clients_attended) {
+        setSatisfiedCount(statsData.clients_attended);
       }
     }).catch(err => {
       console.warn("Error loading stats from Supabase:", err);

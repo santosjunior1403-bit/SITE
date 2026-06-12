@@ -29,11 +29,11 @@ export default function Home() {
 
     if (!supabase) return;
     
-    supabase.from('company_settings').select('company_name, name').single().then(({ data, error }) => {
+    supabase.from('company_settings').select('company_name').single().then(({ data, error }) => {
       if (!error && data) {
-        const name = data.company_name || data.name;
-        if (name) {
-          document.title = `${name} | Dedetização em São Paulo`;
+        const companyName = data.company_name;
+        if (companyName) {
+          document.title = `${companyName} | Dedetização em São Paulo`;
         }
       }
     }).catch(err => {

@@ -70,8 +70,8 @@ export default function BlogPostPage() {
         if (!error && postData) {
           setPost(postData);
           // Fetch company name to display in tab
-          const { data: companyData } = await supabase.from('company_settings').select('company_name, name').single();
-          const companyName = companyData?.company_name || companyData?.name || 'NEXO Dedetizadora';
+          const { data: companyData } = await supabase.from('company_settings').select('company_name').single();
+          const companyName = companyData?.company_name || 'NEXO Dedetizadora';
           document.title = `${postData.title} | ${companyName}`;
         } else {
           // If error or not found, fall back to default posts

@@ -10,14 +10,13 @@ export default function Footer() {
     whatsapp: '(11) 99999-9999',
     email: 'contato@nexodedetizadora.com.br',
     address: '',
-    bairro: '',
-    cidade: '',
-    estado: '',
+    city: '',
+    state: '',
     cep: '',
     business_hours: '',
     google_business_url: '',
-    instagram: '',
-    facebook: ''
+    instagram_url: '',
+    facebook_url: ''
   });
 
   useEffect(() => {
@@ -25,19 +24,18 @@ export default function Footer() {
     supabase.from('company_settings').select('*').single().then(({ data }) => {
       if (data) {
         setCompanyData({
-          company_name: data.company_name || data.name || 'NEXO Dedetizadora',
+          company_name: data.company_name || 'NEXO Dedetizadora',
           phone: data.phone || '',
-          whatsapp: data.whatsapp || '(11) 99999-9999',
+          whatsapp: data.phone || '(11) 99999-9999', // fall back to phone or default
           email: data.email || 'contato@nexodedetizadora.com.br',
           address: data.address || '',
-          bairro: data.bairro || data.neighborhood || '',
-          cidade: data.cidade || data.city || '',
-          estado: data.estado || data.state || '',
-          cep: data.cep || data.zip || '',
-          business_hours: data.business_hours || data.opening_hours || '',
-          google_business_url: data.google_business_url || data.google_business_link || '',
-          instagram: data.instagram || '',
-          facebook: data.facebook || ''
+          city: data.city || '',
+          state: data.state || '',
+          cep: data.cep || '',
+          business_hours: data.business_hours || '',
+          google_business_url: data.google_business_url || '',
+          instagram_url: data.instagram_url || '',
+          facebook_url: data.facebook_url || ''
         });
       }
     });
@@ -46,8 +44,7 @@ export default function Footer() {
   // Format full address for display
   const addressParts = [
     companyData.address,
-    companyData.bairro,
-    companyData.cidade ? `${companyData.cidade}${companyData.estado ? ` - ${companyData.estado}` : ''}` : '',
+    companyData.city ? `${companyData.city}${companyData.state ? ` - ${companyData.state}` : ''}` : '',
     companyData.cep ? `CEP: ${companyData.cep}` : ''
   ].filter(Boolean);
 
@@ -64,13 +61,13 @@ export default function Footer() {
             
             {/* Redes Sociais */}
             <div className="flex gap-4">
-              {companyData.instagram && (
-                <a href={companyData.instagram.startsWith('http') ? companyData.instagram : `https://instagram.com/${companyData.instagram}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors p-2 bg-white/5 rounded-full hover:bg-white/10" aria-label="Instagram">
+              {companyData.instagram_url && (
+                <a href={companyData.instagram_url.startsWith('http') ? companyData.instagram_url : `https://instagram.com/${companyData.instagram_url}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors p-2 bg-white/5 rounded-full hover:bg-white/10" aria-label="Instagram">
                   <Instagram className="w-5 h-5" />
                 </a>
               )}
-              {companyData.facebook && (
-                <a href={companyData.facebook.startsWith('http') ? companyData.facebook : `https://facebook.com/${companyData.facebook}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors p-2 bg-white/5 rounded-full hover:bg-white/10" aria-label="Facebook">
+              {companyData.facebook_url && (
+                <a href={companyData.facebook_url.startsWith('http') ? companyData.facebook_url : `https://facebook.com/${companyData.facebook_url}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors p-2 bg-white/5 rounded-full hover:bg-white/10" aria-label="Facebook">
                   <Facebook className="w-5 h-5" />
                 </a>
               )}
@@ -87,23 +84,12 @@ export default function Footer() {
         <div>
             <h4 className="text-white font-semibold mb-4 text-lg">Fale Conosco</h4>
             <ul className="space-y-4 text-sm">
-                {companyData.whatsapp && (
+                {companyData.phone && (
                   <li className="flex items-start gap-2">
                     <MessageSquare className="w-4 h-4 text-[#00C853] mt-1 shrink-0" />
                     <div>
-                      <span className="font-semibold block text-white text-xs">WhatsApp</span>
-                      <a href={`https://wa.me/${companyData.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors" onClick={() => trackEvent('whatsapp_click', { button: 'footer' })}>
-                        {companyData.whatsapp}
-                      </a>
-                    </div>
-                  </li>
-                )}
-                {companyData.phone && (
-                  <li className="flex items-start gap-2">
-                    <Phone className="w-4 h-4 text-blue-400 mt-1 shrink-0" />
-                    <div>
-                      <span className="font-semibold block text-white text-xs">Telefone</span>
-                      <a href={`tel:${companyData.phone.replace(/\D/g, '')}`} className="hover:text-blue-400 transition-colors" onClick={() => trackEvent('phone_click', { button: 'footer' })}>
+                      <span className="font-semibold block text-white text-xs">WhatsApp / Telefone</span>
+                      <a href={`https://wa.me/${companyData.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors" onClick={() => trackEvent('whatsapp_click', { button: 'footer' })}>
                         {companyData.phone}
                       </a>
                     </div>
