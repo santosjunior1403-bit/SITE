@@ -8,13 +8,17 @@ export default function WhatsAppFloatingButton() {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.from('hero_section').select('whatsapp_number').single().then(({ data, error }) => {
-      if (!error && data && data.whatsapp_number) {
-        setWhatsapp(data.whatsapp_number);
+    const loadWhatsApp = async () => {
+      try {
+        const { data, error } = await supabase.from('hero_section').select('whatsapp_number').single();
+        if (!error && data && data.whatsapp_number) {
+          setWhatsapp(data.whatsapp_number);
+        }
+      } catch (err) {
+        console.warn("Could not load WhatsApp number, using default of 5511999999999", err);
       }
-    }).catch(err => {
-      console.warn("Could not load WhatsApp number, using default of 5511999999999", err);
-    });
+    };
+    loadWhatsApp();
   }, []);
 
   if (!whatsapp) return null;

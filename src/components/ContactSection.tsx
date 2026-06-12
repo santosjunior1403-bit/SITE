@@ -25,33 +25,37 @@ export default function ContactSection() {
   useEffect(() => {
     if (!supabase) return;
     
-    // Fetch whatsapp_number from hero_section
-    supabase.from('hero_section').select('whatsapp_number').single().then(({ data }) => {
-      if (data && data.whatsapp_number) {
-        setWhatsappNum(data.whatsapp_number.replace(/\D/g, ''));
-      }
-    }).catch(err => {
-      console.warn("Could not query custom contact WhatsApp number:", err);
-    });
-
-    // Fetch phone, email, business_hours from company_settings
-    supabase.from('company_settings').select('*').single().then(({ data }) => {
-      if (data) {
-        setCompanySettings({
-          phone: data.phone || '(11) 4003-9128',
-          email: data.email || 'contato@nexodedetizadora.com.br',
-          business_hours: data.business_hours || 'Segunda a Sábado — 08:00 às 18:00',
-          free_quote_label: data.free_quote_label || 'Orçamento Gratuito',
-          free_quote_subtitle: data.free_quote_subtitle || 'Nossa equipe técnica comercial está pronta para atender o seu chamado com agilidade e total eficiência.',
-          contact_center_label: data.contact_center_label || 'Central de Atendimento'
-        });
-        if (data.whatsapp_number) {
+    const loadContactData = async () => {
+      try {
+        const { data, error } = await supabase.from('hero_section').select('whatsapp_number').maybeSingle();
+        if (!error && data && data.whatsapp_number) {
           setWhatsappNum(data.whatsapp_number.replace(/\D/g, ''));
         }
+      } catch (err) {
+        console.warn("Could not query custom contact WhatsApp number:", err);
       }
-    }).catch(err => {
-      console.warn("Could not query company settings in ContactSection:", err);
-    });
+
+      try {
+        const { data, error } = await supabase.from('company_settings').select('*').maybeSingle();
+        if (!error && data) {
+          setCompanySettings({
+            phone: data.phone || '(11) 4003-9128',
+            email: data.email || 'contato@nexodedetizadora.com.br',
+            business_hours: data.business_hours || 'Segunda a Sábado — 08:00 às 18:00',
+            free_quote_label: data.free_quote_label || 'Orçamento Gratuito',
+            free_quote_subtitle: data.free_quote_subtitle || 'Nossa equipe técnica comercial está pronta para atender o seu chamado com agilidade e total eficiência.',
+            contact_center_label: data.contact_center_label || 'Central de Atendimento'
+          });
+          if (data.whatsapp_number) {
+            setWhatsappNum(data.whatsapp_number.replace(/\D/g, ''));
+          }
+        }
+      } catch (err) {
+        console.warn("Could not query company settings in ContactSection:", err);
+      }
+    };
+
+    loadContactData();
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {

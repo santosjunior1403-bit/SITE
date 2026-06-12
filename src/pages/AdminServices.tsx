@@ -14,7 +14,7 @@ export default function AdminServices() {
     image_url: 'bug',
     icon_url: '🪳',
     active: true,
-    order: 1,
+    display_order: 1,
     whatsapp_message: ''
   });
   const [loading, setLoading] = useState(false);
@@ -291,8 +291,8 @@ export default function AdminServices() {
               type="number"
               min={1}
               className="bg-gray-700 p-3.5 rounded-xl text-white font-bold focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm"
-              value={form.order || 1} 
-              onChange={e => setForm({...form, order: Number(e.target.value)})} 
+              value={form.display_order || 1} 
+              onChange={e => setForm({...form, display_order: Number(e.target.value)})} 
             />
           </div>
 

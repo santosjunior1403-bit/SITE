@@ -41,7 +41,7 @@ export default function AdminLayout() {
         // Auto-recreate profile if it disappeared during checked state
         if (!profile) {
           try {
-            supabase.from('admin_profiles').upsert({
+            await supabase.from('admin_profiles').upsert({
               id: session.user.id,
               email: userEmail || 'adm@nexo.com',
               name: 'Administrador Master',
@@ -49,7 +49,7 @@ export default function AdminLayout() {
               perfil: 'admin',
               active: true,
               ativo: true
-            }).catch(e => console.warn("Async auto-create admin profile failure:", e));
+            });
           } catch (e) {
             console.warn("Could not auto-create admin profile in layout checks:", e);
           }

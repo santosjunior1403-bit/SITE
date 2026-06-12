@@ -11,15 +11,19 @@ export default function Navbar() {
         setLogo('/favicon.png');
         return;
     }
-    supabase.from('company_settings').select('logo_url').single().then(({ data }) => {
-      if (data && data.logo_url) {
-        setLogo(data.logo_url);
-      } else {
+    const fetchLogo = async () => {
+      try {
+        const { data } = await supabase.from('company_settings').select('logo_url').single();
+        if (data && data.logo_url) {
+          setLogo(data.logo_url);
+        } else {
+          setLogo('/favicon.png');
+        }
+      } catch (err) {
         setLogo('/favicon.png');
       }
-    }).catch(() => {
-      setLogo('/favicon.png');
-    });
+    };
+    fetchLogo();
   }, []);
 
   return (

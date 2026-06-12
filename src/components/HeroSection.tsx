@@ -64,17 +64,19 @@ export default function HeroSection() {
       } catch (err) {
         console.warn("Error loading banners dynamically:", err);
       }
+
+      // 3. Load stats
+      try {
+        const { data: statsData, error } = await supabase.from('company_settings').select('clients_attended').single();
+        if (!error && statsData && statsData.clients_attended) {
+          setSatisfiedCount(statsData.clients_attended);
+        }
+      } catch (err) {
+        console.warn("Error loading stats from Supabase:", err);
+      }
     };
 
     loadHeroData();
-
-    supabase.from('company_settings').select('clients_attended').single().then(({ data: statsData, error }) => {
-      if (!error && statsData && statsData.clients_attended) {
-        setSatisfiedCount(statsData.clients_attended);
-      }
-    }).catch(err => {
-      console.warn("Error loading stats from Supabase:", err);
-    });
 
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);

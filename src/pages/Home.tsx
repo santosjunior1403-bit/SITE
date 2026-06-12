@@ -32,18 +32,22 @@ export default function Home() {
 
     if (!supabase) return;
     
-    supabase.from('company_settings').select('*').single().then(({ data, error }) => {
-      if (!error && data) {
-        const companyName = data.company_name;
-        if (companyName) {
-          document.title = `${companyName} | Dedetização em São Paulo`;
+    const loadCompanySettings = async () => {
+      try {
+        const { data, error } = await supabase.from('company_settings').select('*').single();
+        if (!error && data) {
+          const companyName = data.company_name;
+          if (companyName) {
+            document.title = `${companyName} | Dedetização em São Paulo`;
+          }
+          setHidePartners(!!data.hide_partners);
+          setHideStats(!!data.hide_stats);
         }
-        setHidePartners(!!data.hide_partners);
-        setHideStats(!!data.hide_stats);
+      } catch (err) {
+        console.warn("Could not query custom company name from database, staying with SEO title:", err);
       }
-    }).catch(err => {
-      console.warn("Could not query custom company name from database, staying with SEO title:", err);
-    });
+    };
+    loadCompanySettings();
   }, []);
 
   return (

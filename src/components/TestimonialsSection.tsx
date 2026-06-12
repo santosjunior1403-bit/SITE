@@ -44,19 +44,23 @@ export default function TestimonialsSection() {
       setData(defaultTestimonials);
       return;
     }
-    supabase.from('testimonials').select('*').limit(3).then(({ data: queryData, error }) => {
-      if (error) {
-        console.warn("Could not retrieve testimonials from Supabase, loading defaults.", error);
-        setData(defaultTestimonials);
-      } else if (queryData && queryData.length > 0) {
-        setData(queryData);
-      } else {
+    const fetchTestimonials = async () => {
+      try {
+        const { data: queryData, error } = await supabase.from('testimonials').select('*').limit(3);
+        if (error) {
+          console.warn("Could not retrieve testimonials from Supabase, loading defaults.", error);
+          setData(defaultTestimonials);
+        } else if (queryData && queryData.length > 0) {
+          setData(queryData);
+        } else {
+          setData(defaultTestimonials);
+        }
+      } catch (err) {
+        console.warn("Error querying testimonials from Supabase:", err);
         setData(defaultTestimonials);
       }
-    }).catch(err => {
-      console.warn("Error querying testimonials from Supabase:", err);
-      setData(defaultTestimonials);
-    });
+    };
+    fetchTestimonials();
   }, []);
 
   return (

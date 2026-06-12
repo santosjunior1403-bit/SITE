@@ -85,17 +85,21 @@ export default function Services() {
   const [whatsappNum, setWhatsappNum] = useState('551140039128');
 
   useEffect(() => {
-    if (supabase) {
-      // Load WhatsApp route from company settings
-      supabase.from('company_settings').select('whatsapp_number, phone').single().then(({ data }) => {
+    if (!supabase) return;
+    const fetchSettings = async () => {
+      try {
+        const { data } = await supabase.from('company_settings').select('whatsapp_number, phone').single();
         if (data) {
           const num = data.whatsapp_number || data.phone || '';
           if (num) {
             setWhatsappNum(num.replace(/\D/g, ''));
           }
         }
-      }).catch(err => console.warn("Error fetching whatsapp number:", err));
-    }
+      } catch (err) {
+        console.warn("Error fetching whatsapp number:", err);
+      }
+    };
+    fetchSettings();
   }, []);
 
   useEffect(() => {
