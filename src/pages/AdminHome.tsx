@@ -123,9 +123,9 @@ export default function AdminHome() {
             image_url: url
           }
         }));
-      } catch (err) {
+      } catch (err: any) {
         console.error("Upload error:", err);
-        alert("Erro no upload da imagem.");
+        alert(err.message || "Erro no upload da imagem.");
       } finally {
         setUploadingField(null);
       }

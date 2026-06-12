@@ -7,23 +7,35 @@ export default function AboutUsSection() {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.from('site_banners').select('*').then(({ data }) => {
-      if (data && Array.isArray(data)) {
-        const aboutBanner = data.find((b: any) => b.banner_type === 'about_banner' && b.active !== false);
-        if (aboutBanner && aboutBanner.image_url) {
-          setBannerUrl(aboutBanner.image_url);
-          return;
+
+    const loadAboutBanner = async () => {
+      let loaded = false;
+      try {
+        const { data } = await supabase.from('site_banners').select('*');
+        if (data && Array.isArray(data)) {
+          const aboutBanner = data.find((b: any) => b.banner_type === 'about_banner' && b.active !== false);
+          if (aboutBanner && aboutBanner.image_url) {
+            setBannerUrl(aboutBanner.image_url);
+            loaded = true;
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load about banner from site_banners, attempting fallback.", err);
+      }
+
+      if (!loaded) {
+        try {
+          const { data: compData } = await supabase.from('company_settings').select('about_banner_url').single();
+          if (compData && compData.about_banner_url) {
+            setBannerUrl(compData.about_banner_url);
+          }
+        } catch (err) {
+          console.warn("Could not load about banner from company_settings.", err);
         }
       }
-      // cascade fallback
-      supabase.from('company_settings').select('about_banner_url').single().then(({ data: compData }) => {
-        if (compData && compData.about_banner_url) {
-          setBannerUrl(compData.about_banner_url);
-        }
-      });
-    }).catch(err => {
-      console.warn("Could not load about banner, using fallback.", err);
-    });
+    };
+
+    loadAboutBanner();
   }, []);
 
   return (
