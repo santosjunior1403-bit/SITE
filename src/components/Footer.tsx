@@ -26,7 +26,7 @@ export default function Footer() {
         setCompanyData({
           company_name: data.company_name || 'NEXO Dedetizadora',
           phone: data.phone || '',
-          whatsapp: data.phone || '(11) 99999-9999', // fall back to phone or default
+          whatsapp: data.whatsapp_number || data.phone || '(11) 99999-9999', // prioritizing whatsapp_number field
           email: data.email || 'contato@nexodedetizadora.com.br',
           address: data.address || '',
           city: data.city || '',
@@ -86,11 +86,22 @@ export default function Footer() {
             <ul className="space-y-4 text-sm">
                 {companyData.phone && (
                   <li className="flex items-start gap-2">
+                    <Phone className="w-4 h-4 text-[#00C853] mt-1 shrink-0" />
+                    <div>
+                      <span className="font-semibold block text-white text-xs">Telefone</span>
+                      <a href={`tel:${companyData.phone.replace(/\D/g, '')}`} className="hover:text-[#00C853] transition-colors">
+                        {companyData.phone}
+                      </a>
+                    </div>
+                  </li>
+                )}
+                {companyData.whatsapp && (
+                  <li className="flex items-start gap-2">
                     <MessageSquare className="w-4 h-4 text-[#00C853] mt-1 shrink-0" />
                     <div>
-                      <span className="font-semibold block text-white text-xs">WhatsApp / Telefone</span>
-                      <a href={`https://wa.me/${companyData.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors" onClick={() => trackEvent('whatsapp_click', { button: 'footer' })}>
-                        {companyData.phone}
+                      <span className="font-semibold block text-white text-xs">WhatsApp</span>
+                      <a href={`https://wa.me/${companyData.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#00C853] transition-colors" onClick={() => trackEvent('whatsapp_click', { button: 'footer' })}>
+                        {companyData.whatsapp}
                       </a>
                     </div>
                   </li>

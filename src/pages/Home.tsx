@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import Services from '../components/Services';
@@ -14,6 +14,9 @@ import WhatsAppFloatingButton from '../components/WhatsAppFloatingButton';
 import { supabase } from '../lib/supabase';
 
 export default function Home() {
+  const [hidePartners, setHidePartners] = useState(false);
+  const [hideStats, setHideStats] = useState(false);
+
   useEffect(() => {
     // Define robust fallback SEO tags so they match requirements precisely
     document.title = 'NEXO Dedetizadora | Dedetização em São Paulo';
@@ -29,12 +32,14 @@ export default function Home() {
 
     if (!supabase) return;
     
-    supabase.from('company_settings').select('company_name').single().then(({ data, error }) => {
+    supabase.from('company_settings').select('*').single().then(({ data, error }) => {
       if (!error && data) {
         const companyName = data.company_name;
         if (companyName) {
           document.title = `${companyName} | Dedetização em São Paulo`;
         }
+        setHidePartners(!!data.hide_partners);
+        setHideStats(!!data.hide_stats);
       }
     }).catch(err => {
       console.warn("Could not query custom company name from database, staying with SEO title:", err);
@@ -45,10 +50,10 @@ export default function Home() {
     <div className="min-h-screen bg-[#081A3A]/5">
         <Navbar />
         <HeroSection />
-        <StatsSection />
+        {!hideStats && <StatsSection />}
         <Services />
         <AboutUsSection />
-        <PartnersSection />
+        {!hidePartners && <PartnersSection />}
         <TestimonialsSection />
         <BlogSection />
         <FAQ />

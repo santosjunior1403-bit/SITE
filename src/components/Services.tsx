@@ -126,15 +126,27 @@ export default function Services() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((s) => (
-            <div key={s.id} className="bg-white/5 backdrop-blur-lg p-8 rounded-2xl border border-white/10 flex flex-col items-center text-center hover:border-[#00C853]/50 transition-all duration-300 group">
+            <div key={s.id} className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 flex flex-col hover:border-[#00C853]/50 transition-all duration-300 group overflow-hidden">
               {s.image_url && (s.image_url.startsWith('http') || s.image_url.startsWith('/')) ? (
-                <img src={s.image_url} alt={s.name} className="w-16 h-16 mb-6 group-hover:scale-110 transition-transform duration-300 object-contain" />
+                <div className="h-48 w-full overflow-hidden relative shrink-0">
+                  <img src={s.image_url} alt={s.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute top-3 left-3 bg-[#081A3A]/80 backdrop-blur text-xs font-semibold px-2.5 py-1 rounded-full text-[#00C853]">
+                    {s.category || 'Serviço'}
+                  </div>
+                </div>
               ) : (
-                renderIcon(s.image_url)
+                <div className="p-8 pb-0 flex flex-col items-center">
+                  {renderIcon(s.image_url)}
+                </div>
               )}
-              <h3 className="font-bold text-2xl mb-4">{s.name}</h3>
-              <p className="text-gray-300 mb-8 flex-grow">{s.short_description || s.full_description}</p>
-              <a href="#contato" className="bg-[#0D47A1] hover:bg-[#00C853] text-white px-6 py-3 rounded-full font-semibold transition-all">Solicitar Orçamento</a>
+              
+              <div className="p-8 flex flex-col flex-grow text-center items-center">
+                <h3 className="font-bold text-2xl mb-4 group-hover:text-[#00C853] transition-colors">{s.name}</h3>
+                <p className="text-gray-300 mb-8 flex-grow text-sm leading-relaxed">{s.short_description || s.full_description}</p>
+                <a href="#contato" className="mt-auto bg-[#0D47A1] hover:bg-[#00C853] text-white px-6 py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105 inline-block text-sm uppercase tracking-wider">
+                  Solicitar Orçamento
+                </a>
+              </div>
             </div>
           ))}
         </div>

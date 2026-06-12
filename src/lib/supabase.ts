@@ -44,7 +44,10 @@ const getFallbackData = (table: string): any => {
       services_completed: "+1200",
       customer_satisfaction: "100%",
       business_hours: "Segunda à Sábado - 08h às 18h",
-      about_banner_url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80"
+      about_banner_url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80",
+      hide_partners: false,
+      hide_stats: false,
+      whatsapp_number: "5511999999999"
     },
     hero_section: {
       id: "fallback-hero-01",
@@ -332,7 +335,8 @@ const ALLOWED_COLUMNS: Record<string, string[]> = {
     'id', 'company_name', 'logo_url', 'phone', 'email', 'address', 'city',
     'state', 'cep', 'instagram_url', 'facebook_url', 'google_business_url',
     'clients_attended', 'services_completed', 'customer_satisfaction', 'business_hours',
-    'free_quote_label', 'free_quote_subtitle', 'contact_center_label', 'about_banner_url'
+    'free_quote_label', 'free_quote_subtitle', 'contact_center_label', 'about_banner_url',
+    'hide_partners', 'hide_stats', 'whatsapp_number'
   ],
   hero_section: [
     'id', 'title', 'subtitle', 'image_url', 'active', 'created_at', 'secondary_banner_url', 'button_text',

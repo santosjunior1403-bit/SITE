@@ -2,69 +2,411 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Service } from '../types';
 import { uploadImage } from '../lib/storage';
+import { Bug, Droplet, Shield, ShieldAlert, Sparkles, AlertOctagon, Plus, Edit, Trash, Eye, EyeOff, MessageCircle, RefreshCw } from 'lucide-react';
 
 export default function AdminServices() {
   const [services, setServices] = useState<Service[]>([]);
-  const [form, setForm] = useState<Partial<Service>>({});
+  const [form, setForm] = useState<Partial<Service>>({
+    name: '',
+    category: '',
+    short_description: '',
+    full_description: '',
+    image_url: 'bug',
+    icon_url: 'bug',
+    active: true,
+    order: 1,
+    whatsapp_message: ''
+  });
   const [loading, setLoading] = useState(false);
+  const [uploadingField, setUploadingField] = useState<'image_url' | null>(null);
 
-  useEffect(() => { fetchServices(); }, []);
+  useEffect(() => { 
+    fetchServices(); 
+  }, []);
 
   const fetchServices = async () => {
-    const { data } = await supabase.from('services').select('*');
-    if (data) setServices(data);
+    if (!supabase) return;
+    try {
+      const { data, error } = await supabase.from('services').select('*').order('order', { ascending: true });
+      if (!error && data) {
+        setServices(data);
+      }
+    } catch (err) {
+      console.error("Error fetching services:", err);
+    }
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'image_url' | 'icon_url') => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'image_url') => {
     if (e.target.files && e.target.files[0]) {
-      setLoading(true);
-      const url = await uploadImage(e.target.files[0], 'services');
-      setForm(prev => ({...prev, [field]: url}));
-      setLoading(false);
+      setUploadingField(field);
+      try {
+        const url = await uploadImage(e.target.files[0], 'services');
+        setForm(prev => ({ ...prev, [field]: url }));
+      } catch (err: any) {
+        alert("Erro no upload da imagem: " + (err.message || err));
+      } finally {
+        setUploadingField(null);
+      }
     }
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.name || !form.category) {
+      alert("Por favor, preencha o Nome e a Categoria.");
+      return;
+    }
+
     setLoading(true);
-    const { error } = form.id 
-      ? await supabase.from('services').update(form).eq('id', form.id)
-      : await supabase.from('services').insert(form);
-      
-    if (error) alert("Erro: " + error.message);
-    else { alert("Salvo com sucesso!"); setForm({}); fetchServices(); }
-    setLoading(false);
+
+    const payload: any = {
+      name: form.name || '',
+      category: form.category || '',
+      short_description: form.short_description || form.full_description || '',
+      full_description: form.full_description || form.short_description || '',
+      image_url: form.image_url || 'bug',
+      icon_url: form.icon_url || form.image_url || 'bug',
+      active: form.active !== false,
+      order: Number(form.order) || 1,
+      whatsapp_message: form.whatsapp_message || `Olá NEXO! Gostaria de um orçamento para o serviço de *${form.name}*.`
+    };
+
+    if (form.id) {
+      payload.id = form.id;
+    }
+
+    try {
+      const { error } = await supabase.from('services').upsert(payload);
+      if (error) {
+        alert("Erro ao salvar serviço: " + error.message);
+      } else {
+        alert("Serviço salvo com sucesso!");
+        resetForm();
+        fetchServices();
+      }
+    } catch (err: any) {
+      alert("Exceção ao salvar: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const editService = (service: Service) => {
+    setForm({
+      ...service,
+      order: service.order || 1,
+      active: service.active !== false
+    });
+    // Scroll smoothly to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const deleteService = async (id: string) => {
-    if (confirm('Excluir?')) {
-        await supabase.from('services').delete().eq('id', id);
-        fetchServices();
+    if (!supabase) return;
+    if (confirm('Tem certeza que deseja excluir permanentemente este serviço?')) {
+      try {
+        const { error } = await supabase.from('services').delete().eq('id', id);
+        if (error) {
+          alert("Erro ao excluir do Supabase: " + error.message);
+        } else {
+          fetchServices();
+        }
+      } catch (err: any) {
+        alert("Exceção ao excluir: " + err.message);
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setForm({
+      name: '',
+      category: '',
+      short_description: '',
+      full_description: '',
+      image_url: 'bug',
+      icon_url: 'bug',
+      active: true,
+      order: services.length + 1,
+      whatsapp_message: ''
+    });
+  };
+
+  const renderIconPreview = (name: string) => {
+    const iconClass = "w-10 h-10 text-[#00C853] shrink-0";
+    switch (name?.toLowerCase()) {
+      case 'bug': return <Bug className={iconClass} />;
+      case 'droplet': return <Droplet className={iconClass} />;
+      case 'shield': return <Shield className={iconClass} />;
+      case 'shieldalert': return <ShieldAlert className={iconClass} />;
+      case 'sparkles': return <Sparkles className={iconClass} />;
+      case 'alertoctagon': return <AlertOctagon className={iconClass} />;
+      default: return <Bug className={iconClass} />;
     }
   };
 
   return (
-    <div className="text-white p-6">
-      <h2 className="text-3xl font-bold mb-8 text-blue-400">Gerenciar Serviços</h2>
-      <form onSubmit={handleSave} className="bg-gray-800 p-8 rounded-xl border border-gray-700 grid md:grid-cols-2 gap-4 mb-8">
-        <input className="bg-gray-700 p-3 rounded" value={form.name || ''} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nome" />
-        <input className="bg-gray-700 p-3 rounded" value={form.category || ''} onChange={e => setForm({...form, category: e.target.value})} placeholder="Categoria" />
-        <textarea className="col-span-2 bg-gray-700 p-3 rounded" value={form.short_description || ''} onChange={e => setForm({...form, short_description: e.target.value})} placeholder="Descrição curta" />
-        <textarea className="col-span-2 bg-gray-700 p-3 rounded" value={form.full_description || ''} onChange={e => setForm({...form, full_description: e.target.value})} placeholder="Descrição completa" />
-        <label className="text-sm text-gray-300">Foto</label>
-        <input type="file" onChange={(e) => handleUpload(e, 'image_url')} />
-        <button type="submit" disabled={loading} className="col-span-2 bg-blue-600 p-3 rounded">{loading ? 'Salvando...' : 'Salvar'}</button>
-      </form>
-      <div className="grid gap-4">
-        {services.map(s => (
-          <div key={s.id} className="bg-gray-800 p-4 rounded flex justify-between items-center">
-            <span>{s.name}</span>
-            <div className='flex gap-2'>
-              <button onClick={() => setForm(s)} className="text-blue-400">Editar</button>
-              <button onClick={() => deleteService(s.id)} className="text-red-400">Excluir</button>
+    <div className="p-6 font-sans text-white">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-3xl font-extrabold text-[#00C853] tracking-tight">Gerenciar Serviços</h2>
+          <p className="text-gray-400 text-sm mt-1">Crie, edite fotos e personalize os serviços exibidos no site.</p>
+        </div>
+        {form.id && (
+          <button 
+            onClick={resetForm}
+            className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
+          >
+            <Plus size={16} /> Novo Serviço
+          </button>
+        )}
+      </div>
+
+      {/* Modern Form */}
+      <form onSubmit={handleSave} className="bg-gray-800 p-8 rounded-2xl border border-gray-700/80 grid md:grid-cols-2 gap-6 mb-12 shadow-xl">
+        <h3 className="text-lg font-bold text-gray-200 md:col-span-2 border-b border-gray-700/50 pb-3 flex items-center gap-2">
+          {form.id ? <Edit size={18} className="text-[#00C853]" /> : <Plus size={18} className="text-[#00C853]" />}
+          {form.id ? 'Editar Serviço Existente' : 'Cadastrar Novo Serviço'}
+        </h3>
+
+        {/* Name & Category */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Nome do Serviço</label>
+          <input 
+            type="text"
+            className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm"
+            value={form.name || ''} 
+            onChange={e => setForm({...form, name: e.target.value})} 
+            placeholder="Ex: Controle de Baratas, Limpeza de Caixa d'Água"
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Categoria</label>
+          <input 
+            type="text"
+            className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm"
+            value={form.category || ''} 
+            onChange={e => setForm({...form, category: e.target.value})} 
+            placeholder="Ex: Dedetização, Desinsetização, Limpeza"
+            required
+          />
+        </div>
+
+        {/* Short & Full Descriptions */}
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Descrição Curta (Exibida no Card)</label>
+          <textarea 
+            rows={2}
+            className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm resize-none"
+            value={form.short_description || ''} 
+            onChange={e => setForm({...form, short_description: e.target.value})} 
+            placeholder="Uma frase marcante resumindo os benefícios principais do serviço..."
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Descrição Completa</label>
+          <textarea 
+            rows={3}
+            className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm resize-none"
+            value={form.full_description || ''} 
+            onChange={e => setForm({...form, full_description: e.target.value})} 
+            placeholder="Forneça detalhes adicionais sobre como funciona a aplicação técnica..."
+          />
+        </div>
+
+        {/* WhatsApp Custom Text & Display Order */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Texto Customizado do WhatsApp (Ao Clicar no Site)</label>
+          <input 
+            type="text"
+            className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm"
+            value={form.whatsapp_message || ''} 
+            onChange={e => setForm({...form, whatsapp_message: e.target.value})} 
+            placeholder="Ex: Olá NEXO! Quero agendar dedetização contra baratas."
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Ordem de Exibição</label>
+            <input 
+              type="number"
+              min={1}
+              className="bg-gray-700 p-3.5 rounded-xl text-white font-bold focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm"
+              value={form.order || 1} 
+              onChange={e => setForm({...form, order: Number(e.target.value)})} 
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Status</label>
+            <label className="flex items-center gap-2 bg-gray-700/50 p-3 rounded-xl cursor-pointer hover:bg-gray-700/80 transition text-sm font-semibold select-none mt-1 h-12 border border-transparent focus-within:border-[#00C853]/60">
+              <input 
+                type="checkbox" 
+                checked={form.active !== false} 
+                onChange={e => setForm({...form, active: e.target.checked})} 
+                className="w-5 h-5 accent-[#00C853] cursor-pointer"
+              />
+              <span>Ativo no Site</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Photo Upload segment */}
+        <div className="md:col-span-2 border-t border-gray-700/50 pt-6 mt-2 grid md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Foto do Serviço (Upload para o site)</label>
+            <p className="text-xs text-gray-400">Dimensões ideais de 600x400 para preencher os cards com elegância.</p>
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={(e) => handleUpload(e, 'image_url')} 
+              className="bg-gray-700 p-3 rounded-xl text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#00C853] file:text-white hover:file:bg-[#00a846] cursor-pointer w-full" 
+            />
+            
+            <div className="flex items-center gap-3 mt-4">
+              <span className="text-xs text-gray-400">Ou use uma predefinição de vetor:</span>
+              <select 
+                className="bg-gray-700 p-1.5 rounded text-xs outline-none border border-gray-600 focus:border-[#00C853]"
+                value={['bug', 'droplet', 'shield', 'shieldalert', 'sparkles', 'alertoctagon'].includes(form.image_url || '') ? form.image_url : 'custom'}
+                onChange={e => {
+                  if (e.target.value !== 'custom') {
+                    setForm({ ...form, image_url: e.target.value });
+                  }
+                }}
+              >
+                <option value="bug">Bug (Inseto/Barata)</option>
+                <option value="droplet">Droplet (Água/Limpeza)</option>
+                <option value="shield">Shield (Defesa/Prevenção)</option>
+                <option value="shieldalert">Shield Alert (Ratos/Perigo)</option>
+                <option value="sparkles">Sparkles (Sanitização/Ar)</option>
+                <option value="alertoctagon">Alert Octagon (Atenção)</option>
+                <option value="custom">-- Utilizar Minha Foto Enviada --</option>
+              </select>
             </div>
           </div>
-        ))}
+
+          <div className="flex flex-col items-center justify-center p-4 bg-gray-900/60 rounded-2xl border border-gray-700/70 min-h-36">
+            {uploadingField === 'image_url' ? (
+              <div className="flex flex-col items-center gap-2">
+                <RefreshCw className="animate-spin text-[#00C853] w-8 h-8" />
+                <span className="text-xs text-gray-300">Enviando imagem...</span>
+              </div>
+            ) : form.image_url && (form.image_url.startsWith('http') || form.image_url.startsWith('/')) ? (
+              <div className="w-full relative rounded-xl overflow-hidden aspect-video max-h-32">
+                <img src={form.image_url} alt="Pre-visualização" className="w-full h-full object-cover" />
+                <button 
+                  type="button"
+                  onClick={() => setForm({...form, image_url: 'bug'})} 
+                  className="absolute top-2 right-2 bg-red-600 hover:bg-red-500 rounded px-1.5 py-0.5 text-[10px] font-bold text-white transition cursor-pointer"
+                >
+                  Remover Foto
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                {renderIconPreview(form.image_url || 'bug')}
+                <span className="text-xs text-gray-400">Usando Ícone Vetorial: {form.image_url}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Form Actions */}
+        <div className="md:col-span-2 border-t border-gray-700/50 pt-4 mt-2 flex justify-end gap-3">
+          {form.id && (
+            <button 
+              type="button" 
+              onClick={resetForm}
+              className="bg-gray-700 hover:bg-gray-600 px-6 py-3.5 rounded-xl font-bold transition duration-200 cursor-pointer text-sm"
+            >
+              Cancelar Edição
+            </button>
+          )}
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="bg-[#00C853] hover:bg-[#00a846] px-8 py-3.5 rounded-xl font-bold transition duration-200 cursor-pointer hover:shadow-lg text-sm text-white uppercase tracking-wider"
+          >
+            {loading ? 'Salvando...' : form.id ? 'Salvar Alterações' : 'Cadastrar Serviço'}
+          </button>
+        </div>
+      </form>
+
+      {/* Services List / Cards */}
+      <h3 className="text-xl font-bold mb-6 text-gray-200 border-b border-gray-700/50 pb-2">Serviços Atuais ({services.length})</h3>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {services.length === 0 ? (
+          <div className="col-span-full py-12 text-center text-gray-500 font-medium">
+            Nenhum serviço cadastrado no momento. Preencha o formulário acima para adicionar!
+          </div>
+        ) : (
+          services.map(s => (
+            <div key={s.id} className="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col justify-between hover:border-gray-600 transition shadow-md">
+              <div>
+                <div className="flex justify-between items-start gap-4 mb-4">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#00C853] bg-[#00C853]/10 px-2 py-0.5 rounded-full">
+                      {s.category}
+                    </span>
+                    <h4 className="font-bold text-lg mt-1 text-white">{s.name}</h4>
+                  </div>
+                  <div className="text-xs font-bold text-gray-400">
+                    Ordem: #{s.order || 1}
+                  </div>
+                </div>
+
+                <p className="text-gray-300 text-xs line-clamp-3 mb-4 leading-relaxed">
+                  {s.short_description || s.full_description}
+                </p>
+
+                {/* Cover or Icon Preview */}
+                <div className="h-32 bg-gray-900 rounded-xl overflow-hidden mb-4 flex items-center justify-center border border-gray-700/50 relative">
+                  {s.image_url && (s.image_url.startsWith('http') || s.image_url.startsWith('/')) ? (
+                    <img src={s.image_url} alt={s.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex flex-col items-center gap-1.5">
+                      {renderIconPreview(s.image_url)}
+                      <span className="text-[10px] text-gray-500">Ícone: {s.image_url}</span>
+                    </div>
+                  )}
+                  
+                  {/* Status overlay badge */}
+                  <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-[#081A3A]/80 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-semibold">
+                    {s.active !== false ? (
+                      <>
+                        <Eye size={10} className="text-[#00C853]" />
+                        <span className="text-gray-200">Visível</span>
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff size={10} className="text-red-400" />
+                        <span className="text-gray-400">Oculto</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 border-t border-gray-700/50 pt-4 mt-2">
+                <button 
+                  onClick={() => editService(s)}
+                  className="flex items-center gap-1 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                >
+                  <Edit size={12} /> Editar
+                </button>
+                <button 
+                  onClick={() => deleteService(s.id)}
+                  className="flex items-center gap-1 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                >
+                  <Trash size={12} /> Excluir
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

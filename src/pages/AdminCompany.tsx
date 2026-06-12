@@ -24,7 +24,10 @@ export default function AdminCompany() {
     free_quote_label: '',
     free_quote_subtitle: '',
     contact_center_label: '',
-    about_banner_url: ''
+    about_banner_url: '',
+    hide_partners: false,
+    hide_stats: false,
+    whatsapp_number: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -84,7 +87,10 @@ export default function AdminCompany() {
       free_quote_label: form.free_quote_label || '',
       free_quote_subtitle: form.free_quote_subtitle || '',
       contact_center_label: form.contact_center_label || '',
-      about_banner_url: form.about_banner_url || ''
+      about_banner_url: form.about_banner_url || '',
+      hide_partners: !!form.hide_partners,
+      hide_stats: !!form.hide_stats,
+      whatsapp_number: form.whatsapp_number || ''
     };
 
     if (settings && settings.id) {
@@ -147,6 +153,16 @@ export default function AdminCompany() {
         </div>
 
         <div className="flex flex-col gap-1.5">
+          <label className="text-sm text-gray-300 font-semibold tracking-wide uppercase text-xs">WhatsApp de Contato (DDD + Número, sem símbolos)</label>
+          <input 
+            className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent" 
+            value={form.whatsapp_number || ''} 
+            onChange={e => setForm({...form, whatsapp_number: e.target.value})} 
+            placeholder="Ex: 5511999999999" 
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5 md:col-span-2">
           <label className="text-sm text-gray-300 font-semibold tracking-wide uppercase text-xs">E-mail Comercial</label>
           <input 
             type="email"
@@ -356,6 +372,40 @@ export default function AdminCompany() {
                 placeholder="Ex: 100%" 
               />
             </div>
+          </div>
+        </div>
+
+        {/* Visibilidade de Seções do Site */}
+        <div className="md:col-span-2 border-t border-gray-700/50 pt-6 mt-2">
+          <h3 className="text-base font-bold text-[#00C853] tracking-wide uppercase mb-4">Visibilidade de Seções do Site</h3>
+          <p className="text-xs text-gray-400 mb-4">Escolha quais seções ocultar ou exibir na página inicial do seu site.</p>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <label className="flex items-center gap-3 p-4 bg-gray-700/50 hover:bg-gray-700 rounded-xl cursor-pointer transition">
+              <input 
+                type="checkbox" 
+                checked={!!form.hide_partners} 
+                onChange={e => setForm({...form, hide_partners: e.target.checked})} 
+                className="w-5 h-5 accent-[#00C853]"
+              />
+              <div>
+                <p className="font-semibold text-white text-sm">Ocultar Seção "Empresas Parceiras"</p>
+                <p className="text-xs text-gray-400">Ative para não mostrar a área de logotipos de clientes/parceiros e empresas associadas.</p>
+              </div>
+            </label>
+
+            <label className="flex items-center gap-3 p-4 bg-gray-700/50 hover:bg-gray-700 rounded-xl cursor-pointer transition">
+              <input 
+                type="checkbox" 
+                checked={!!form.hide_stats} 
+                onChange={e => setForm({...form, hide_stats: e.target.checked})} 
+                className="w-5 h-5 accent-[#00C853]"
+              />
+              <div>
+                <p className="font-semibold text-white text-sm">Ocultar Seção de Estatísticas ("Clientes Atendidos")</p>
+                <p className="text-xs text-gray-400">Ative para não mostrar os contadores numéricos (atendidos, realizados, etc).</p>
+              </div>
+            </label>
           </div>
         </div>
 

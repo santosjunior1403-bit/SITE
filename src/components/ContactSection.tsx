@@ -45,6 +45,9 @@ export default function ContactSection() {
           free_quote_subtitle: data.free_quote_subtitle || 'Nossa equipe técnica comercial está pronta para atender o seu chamado com agilidade e total eficiência.',
           contact_center_label: data.contact_center_label || 'Central de Atendimento'
         });
+        if (data.whatsapp_number) {
+          setWhatsappNum(data.whatsapp_number.replace(/\D/g, ''));
+        }
       }
     }).catch(err => {
       console.warn("Could not query company settings in ContactSection:", err);

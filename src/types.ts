@@ -19,6 +19,9 @@ export interface CompanySettings {
   free_quote_subtitle?: string;
   contact_center_label?: string;
   about_banner_url?: string;
+  hide_partners?: boolean;
+  hide_stats?: boolean;
+  whatsapp_number?: string;
 }
 
 export interface HeroSection {
