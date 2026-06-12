@@ -513,6 +513,9 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
                 const normalized = normalizeOutputData(tableName, fb);
                 return resolve({ data: normalized, error: null });
               } else if (mode === 'insert' || mode === 'update' || mode === 'upsert') {
+                if (tableName === 'company_settings') {
+                  return resolve(result);
+                }
                 saveFallbackData(tableName, payload, updateId || payload?.id);
                 const normalized = normalizeOutputData(tableName, payload);
                 return resolve({ data: normalized, error: null });
@@ -539,6 +542,9 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
               const normalized = normalizeOutputData(tableName, fb);
               return resolve({ data: normalized, error: null });
             } else {
+              if (tableName === 'company_settings') {
+                return resolve({ data: null, error: err });
+              }
               if (payload) {
                 saveFallbackData(tableName, payload);
               }
@@ -552,7 +558,7 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
         return function(...args: any[]) {
           const lowerProp = prop.toLowerCase();
           if (lowerProp === 'select') {
-            mode = 'select';
+            if (mode === 'select') mode = 'select';
           } else if (lowerProp === 'insert') {
             mode = 'insert';
             payload = sanitizeAndSavePayload(tableName, args[0]);
@@ -588,7 +594,7 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
           let runtimeArgs = [...args];
 
           if (lowerProp === 'select') {
-            mode = 'select';
+            if (mode === 'select') mode = 'select';
           } else if (lowerProp === 'insert') {
             mode = 'insert';
             runtimeArgs[0] = sanitizeAndSavePayload(tableName, args[0]);

@@ -65,7 +65,7 @@ export default function AdminCompany() {
     e.preventDefault();
     setLoading(true);
 
-    const payload = {
+    const payload: any = {
       company_name: form.company_name || '',
       logo_url: form.logo_url || '',
       phone: form.phone || '',
@@ -87,16 +87,29 @@ export default function AdminCompany() {
       about_banner_url: form.about_banner_url || ''
     };
 
+    if (settings && settings.id) {
+      payload.id = settings.id;
+    } else {
+      payload.id = 'fallback-comp-01';
+    }
+
     try {
-      const { error } = settings && settings.id
-        ? await supabase.from('company_settings').update(payload).eq('id', settings.id)
-        : await supabase.from('company_settings').insert(payload);
+      const { data: savedData, error } = await supabase
+        .from('company_settings')
+        .upsert(payload)
+        .select()
+        .single();
         
       if (error) {
-        alert("Erro ao salvar: " + error.message);
+        alert("Erro ao salvar no Supabase: " + error.message);
       } else {
         alert("Salvo com sucesso!");
-        fetchSettings();
+        if (savedData) {
+          setSettings(savedData);
+          setForm(savedData);
+        } else {
+          await fetchSettings();
+        }
       }
     } catch (err: any) {
       alert("Exceção ao salvar: " + err.message);
