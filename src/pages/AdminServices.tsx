@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Service } from '../types';
 import { uploadImage } from '../lib/storage';
-import { Bug, Droplet, Shield, ShieldAlert, Sparkles, AlertOctagon, Plus, Edit, Trash, Eye, EyeOff, MessageCircle, RefreshCw } from 'lucide-react';
+import { Bug, Droplet, Shield, ShieldAlert, Sparkles, AlertOctagon, Plus, Edit, Trash, Eye, EyeOff, ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
 
 export default function AdminServices() {
   const [services, setServices] = useState<Service[]>([]);
@@ -12,7 +12,7 @@ export default function AdminServices() {
     short_description: '',
     full_description: '',
     image_url: 'bug',
-    icon_url: 'bug',
+    icon_url: '🪳',
     active: true,
     order: 1,
     whatsapp_message: ''
@@ -65,7 +65,7 @@ export default function AdminServices() {
       short_description: form.short_description || form.full_description || '',
       full_description: form.full_description || form.short_description || '',
       image_url: form.image_url || 'bug',
-      icon_url: form.icon_url || form.image_url || 'bug',
+      icon_url: form.icon_url || '🪳',
       active: form.active !== false,
       order: Number(form.order) || 1,
       whatsapp_message: form.whatsapp_message || `Olá NEXO! Gostaria de um orçamento para o serviço de *${form.name}*.`
@@ -124,16 +124,60 @@ export default function AdminServices() {
       short_description: '',
       full_description: '',
       image_url: 'bug',
-      icon_url: 'bug',
+      icon_url: '🪳',
       active: true,
       order: services.length + 1,
       whatsapp_message: ''
     });
   };
 
+  const handleMoveOrder = async (service: Service, direction: number) => {
+    if (!supabase) return;
+    const currentIndex = services.findIndex(s => s.id === service.id);
+    if (currentIndex === -1) return;
+    const targetIndex = currentIndex + direction;
+    if (targetIndex < 0 || targetIndex >= services.length) return;
+
+    const copy = [...services];
+    // Keep reference or assign default sequence if order values are equal or undefined
+    const originalOrder = copy[currentIndex].order || (currentIndex + 1);
+    const targetOrder = copy[targetIndex].order || (targetIndex + 1);
+
+    // Make sure we have separate values
+    const finalOriginalOrder = originalOrder === targetOrder ? originalOrder + direction : targetOrder;
+    const finalTargetOrder = originalOrder;
+
+    copy[currentIndex].order = finalOriginalOrder;
+    copy[targetIndex].order = finalTargetOrder;
+
+    try {
+      setLoading(true);
+      await Promise.all([
+        supabase.from('services').upsert(copy[currentIndex]),
+        supabase.from('services').upsert(copy[targetIndex])
+      ]);
+      fetchServices();
+    } catch (e: any) {
+      alert("Erro ao reordenar: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderIconPreview = (name: string) => {
     const iconClass = "w-10 h-10 text-[#00C853] shrink-0";
-    switch (name?.toLowerCase()) {
+    if (!name) return <Bug className={iconClass} />;
+
+    const isEmoji = /\p{Emoji}/u.test(name);
+    if (isEmoji && name.length <= 8) {
+      return (
+        <span className="text-3xl select-none h-10 w-10 flex items-center justify-center">
+          {name}
+        </span>
+      );
+    }
+
+    switch (name.toLowerCase()) {
       case 'bug': return <Bug className={iconClass} />;
       case 'droplet': return <Droplet className={iconClass} />;
       case 'shield': return <Shield className={iconClass} />;
@@ -149,7 +193,7 @@ export default function AdminServices() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-3xl font-extrabold text-[#00C853] tracking-tight">Gerenciar Serviços</h2>
-          <p className="text-gray-400 text-sm mt-1">Crie, edite fotos e personalize os serviços exibidos no site.</p>
+          <p className="text-gray-400 text-sm mt-1">Crie, edite fotos, defina ícones/emojis e mude a ordem dos serviços exibidos no site.</p>
         </div>
         {form.id && (
           <button 
@@ -208,7 +252,7 @@ export default function AdminServices() {
         <div className="flex flex-col gap-1.5 md:col-span-2">
           <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Descrição Completa</label>
           <textarea 
-            rows={3}
+            rows={4}
             className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm resize-none"
             value={form.full_description || ''} 
             onChange={e => setForm({...form, full_description: e.target.value})} 
@@ -216,9 +260,21 @@ export default function AdminServices() {
           />
         </div>
 
-        {/* WhatsApp Custom Text & Display Order */}
+        {/* Custom Icon/Emoji Field & Display Order */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Texto Customizado do WhatsApp (Ao Clicar no Site)</label>
+          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Ícone ou Emoji do Serviço</label>
+          <input 
+            type="text"
+            className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm"
+            value={form.icon_url || ''} 
+            onChange={e => setForm({...form, icon_url: e.target.value})} 
+            placeholder="Ex: 🪳, 🐀, 🐜, 🪵, 🦟, 🚰 ou bug, droplet, shield..."
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide font-sans">Texto Customizado do WhatsApp (Ao Clicar no Site)</label>
           <input 
             type="text"
             className="bg-gray-700 p-3.5 rounded-xl text-white font-medium focus:border-[#00C853] outline-none transition-colors border border-transparent text-sm"
@@ -258,7 +314,7 @@ export default function AdminServices() {
         <div className="md:col-span-2 border-t border-gray-700/50 pt-6 mt-2 grid md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">Foto do Serviço (Upload para o site)</label>
-            <p className="text-xs text-gray-400">Dimensões ideais de 600x400 para preencher os cards com elegância.</p>
+            <p className="text-xs text-gray-400">Envie um arquivo ou cole um endereço de imagem da web para ilustrar o card.</p>
             <input 
               type="file" 
               accept="image/*"
@@ -266,25 +322,15 @@ export default function AdminServices() {
               className="bg-gray-700 p-3 rounded-xl text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#00C853] file:text-white hover:file:bg-[#00a846] cursor-pointer w-full" 
             />
             
-            <div className="flex items-center gap-3 mt-4">
-              <span className="text-xs text-gray-400">Ou use uma predefinição de vetor:</span>
-              <select 
-                className="bg-gray-700 p-1.5 rounded text-xs outline-none border border-gray-600 focus:border-[#00C853]"
-                value={['bug', 'droplet', 'shield', 'shieldalert', 'sparkles', 'alertoctagon'].includes(form.image_url || '') ? form.image_url : 'custom'}
-                onChange={e => {
-                  if (e.target.value !== 'custom') {
-                    setForm({ ...form, image_url: e.target.value });
-                  }
-                }}
-              >
-                <option value="bug">Bug (Inseto/Barata)</option>
-                <option value="droplet">Droplet (Água/Limpeza)</option>
-                <option value="shield">Shield (Defesa/Prevenção)</option>
-                <option value="shieldalert">Shield Alert (Ratos/Perigo)</option>
-                <option value="sparkles">Sparkles (Sanitização/Ar)</option>
-                <option value="alertoctagon">Alert Octagon (Atenção)</option>
-                <option value="custom">-- Utilizar Minha Foto Enviada --</option>
-              </select>
+            <div className="flex flex-col gap-1.5 mt-2">
+              <span className="text-xs text-gray-400">Ou cole uma URL direta da internet:</span>
+              <input 
+                type="text"
+                className="bg-gray-700 p-2 rounded text-xs outline-none border border-gray-600 focus:border-[#00C853]"
+                value={(!form.image_url || ['bug', 'droplet', 'shield', 'shieldalert', 'sparkles', 'alertoctagon'].includes(form.image_url)) ? '' : form.image_url}
+                onChange={e => setForm({...form, image_url: e.target.value || 'bug'})}
+                placeholder="Ex http://exemplo.com/imagem.jpg"
+              />
             </div>
           </div>
 
@@ -296,10 +342,10 @@ export default function AdminServices() {
               </div>
             ) : form.image_url && (form.image_url.startsWith('http') || form.image_url.startsWith('/')) ? (
               <div className="w-full relative rounded-xl overflow-hidden aspect-video max-h-32">
-                <img src={form.image_url} alt="Pre-visualização" className="w-full h-full object-cover" />
+                <img src={form.image_url} alt="Pre-visualização" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 <button 
                   type="button"
-                  onClick={() => setForm({...form, image_url: 'bug'})} 
+                  onClick={() => setForm({...form, image_url: 'bug', icon_url: '🪳'})} 
                   className="absolute top-2 right-2 bg-red-600 hover:bg-red-500 rounded px-1.5 py-0.5 text-[10px] font-bold text-white transition cursor-pointer"
                 >
                   Remover Foto
@@ -307,8 +353,8 @@ export default function AdminServices() {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
-                {renderIconPreview(form.image_url || 'bug')}
-                <span className="text-xs text-gray-400">Usando Ícone Vetorial: {form.image_url}</span>
+                {renderIconPreview(form.icon_url || form.image_url || 'bug')}
+                <span className="text-xs text-gray-400">Usando Ícone/Emoji: {form.icon_url || form.image_url || 'bug'}</span>
               </div>
             )}
           </div>
@@ -320,7 +366,7 @@ export default function AdminServices() {
             <button 
               type="button" 
               onClick={resetForm}
-              className="bg-gray-700 hover:bg-gray-600 px-6 py-3.5 rounded-xl font-bold transition duration-200 cursor-pointer text-sm"
+              className="bg-gray-700 hover:bg-gray-600 px-6 py-3.5 rounded-xl font-bold transition duration-200 cursor-pointer text-sm font-sans"
             >
               Cancelar Edição
             </button>
@@ -328,7 +374,7 @@ export default function AdminServices() {
           <button 
             type="submit" 
             disabled={loading} 
-            className="bg-[#00C853] hover:bg-[#00a846] px-8 py-3.5 rounded-xl font-bold transition duration-200 cursor-pointer hover:shadow-lg text-sm text-white uppercase tracking-wider"
+            className="bg-[#00C853] hover:bg-[#00a846] px-8 py-3.5 rounded-xl font-bold transition duration-200 cursor-pointer hover:shadow-lg text-sm text-white uppercase tracking-wider font-sans"
           >
             {loading ? 'Salvando...' : form.id ? 'Salvar Alterações' : 'Cadastrar Serviço'}
           </button>
@@ -339,11 +385,11 @@ export default function AdminServices() {
       <h3 className="text-xl font-bold mb-6 text-gray-200 border-b border-gray-700/50 pb-2">Serviços Atuais ({services.length})</h3>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-gray-500 font-medium">
+          <div className="col-span-full py-12 text-center text-gray-500 font-medium font-sans">
             Nenhum serviço cadastrado no momento. Preencha o formulário acima para adicionar!
           </div>
         ) : (
-          services.map(s => (
+          services.map((s, idx) => (
             <div key={s.id} className="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col justify-between hover:border-gray-600 transition shadow-md">
               <div>
                 <div className="flex justify-between items-start gap-4 mb-4">
@@ -354,22 +400,32 @@ export default function AdminServices() {
                     <h4 className="font-bold text-lg mt-1 text-white">{s.name}</h4>
                   </div>
                   <div className="text-xs font-bold text-gray-400">
-                    Ordem: #{s.order || 1}
+                    Ordem: #{s.order || (idx + 1)}
                   </div>
                 </div>
 
-                <p className="text-gray-300 text-xs line-clamp-3 mb-4 leading-relaxed">
-                  {s.short_description || s.full_description}
-                </p>
+                <div className="flex flex-col gap-1.5 mb-4">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Resumo:</span>
+                  <p className="text-gray-300 text-xs line-clamp-2 leading-relaxed">
+                    {s.short_description || s.full_description}
+                  </p>
+                </div>
 
                 {/* Cover or Icon Preview */}
                 <div className="h-32 bg-gray-900 rounded-xl overflow-hidden mb-4 flex items-center justify-center border border-gray-700/50 relative">
                   {s.image_url && (s.image_url.startsWith('http') || s.image_url.startsWith('/')) ? (
-                    <img src={s.image_url} alt={s.name} className="w-full h-full object-cover" />
+                    <>
+                      <img src={s.image_url} alt={s.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      {s.icon_url && (
+                        <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[#081A3A]/90 border border-white/10 flex items-center justify-center text-lg shadow">
+                          {renderIconPreview(s.icon_url)}
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="flex flex-col items-center gap-1.5">
-                      {renderIconPreview(s.image_url)}
-                      <span className="text-[10px] text-gray-500">Ícone: {s.image_url}</span>
+                      {renderIconPreview(s.icon_url || s.image_url)}
+                      <span className="text-[10px] text-gray-500">Ícone: {s.icon_url || s.image_url}</span>
                     </div>
                   )}
                   
@@ -390,19 +446,45 @@ export default function AdminServices() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 border-t border-gray-700/50 pt-4 mt-2">
-                <button 
-                  onClick={() => editService(s)}
-                  className="flex items-center gap-1 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
-                >
-                  <Edit size={12} /> Editar
-                </button>
-                <button 
-                  onClick={() => deleteService(s.id)}
-                  className="flex items-center gap-1 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
-                >
-                  <Trash size={12} /> Excluir
-                </button>
+              <div className="flex justify-between items-center border-t border-gray-700/50 pt-4 mt-2">
+                {/* Positional Reordering tools */}
+                <div className="flex items-center gap-1">
+                  <button 
+                    type="button"
+                    onClick={() => handleMoveOrder(s, -1)}
+                    disabled={idx === 0}
+                    className="flex items-center justify-center p-2 rounded bg-gray-700 hover:bg-gray-600 hover:text-[#00C853] disabled:opacity-30 text-gray-300 transition cursor-pointer"
+                    title="Mover para cima"
+                  >
+                    <ArrowUp size={14} />
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => handleMoveOrder(s, 1)}
+                    disabled={idx === services.length - 1}
+                    className="flex items-center justify-center p-2 rounded bg-gray-700 hover:bg-gray-600 hover:text-[#00C853] disabled:opacity-30 text-gray-300 transition cursor-pointer"
+                    title="Mover para baixo"
+                  >
+                    <ArrowDown size={14} />
+                  </button>
+                </div>
+
+                <div className="flex gap-1.5">
+                  <button 
+                    type="button"
+                    onClick={() => editService(s)}
+                    className="flex items-center gap-1 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer font-sans"
+                  >
+                    <Edit size={12} /> Editar
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => deleteService(s.id)}
+                    className="flex items-center gap-1 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer font-sans"
+                  >
+                    <Trash size={12} /> Excluir
+                  </button>
+                </div>
               </div>
             </div>
           ))

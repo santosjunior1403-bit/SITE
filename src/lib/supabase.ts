@@ -64,27 +64,75 @@ const getFallbackData = (table: string): any => {
     services: [
       {
         id: "serv-01",
-        title: "Desinsetização",
-        description: "Controle especializado contra baratas, formigas, pulgas e aranhas.",
-        icon: "ShieldAlert",
+        name: "Controle de Baratas",
+        short_description: "Eliminação rápida e eficaz de infestações.",
+        full_description: "Eliminação de baratas em residências, empresas, condomínios, restaurantes e comércios. Aplicação segura e eficiente para prevenir novas infestações.",
+        image_url: "bug",
+        icon_url: "bug",
+        category: "Dedetização",
         active: true,
-        order: 1
+        order: 1,
+        whatsapp_message: "Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Baratas."
       },
       {
         id: "serv-02",
-        title: "Desratização",
-        description: "Eliminação e prevenção de ratos de telhado, ratazanas e camundongos.",
-        icon: "Shield",
+        name: "Controle de Ratos",
+        short_description: "Proteção contra roedores e doenças.",
+        full_description: "Combate e monitoramento de ratos, camundongos e ratazanas. Utilização de iscas e técnicas profissionais para proteger sua saúde e patrimônio.",
+        image_url: "shieldalert",
+        icon_url: "shieldalert",
+        category: "Desratização",
         active: true,
-        order: 2
+        order: 2,
+        whatsapp_message: "Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Ratos."
       },
       {
-         id: "serv-03",
-         title: "Descupinização",
-         description: "Controle de cupins de madeira seca e de solo com garantia.",
-         icon: "Zap",
-         active: true,
-         order: 3
+        id: "serv-03",
+        name: "Controle de Formigas",
+        short_description: "Combate definitivo às colônias.",
+        full_description: "Tratamento especializado para eliminar colônias de formigas domésticas e cortadeiras, evitando danos e contaminações.",
+        image_url: "bug",
+        icon_url: "bug",
+        category: "Dedetização",
+        active: true,
+        order: 3,
+        whatsapp_message: "Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Formigas."
+      },
+      {
+        id: "serv-04",
+        name: "Controle de Cupins",
+        short_description: "Proteja móveis e estruturas.",
+        full_description: "Identificação e eliminação de cupins de solo e madeira seca. Proteção para móveis, telhados, portas, pisos e estruturas.",
+        image_url: "shield",
+        icon_url: "shield",
+        category: "Descupinização",
+        active: true,
+        order: 4,
+        whatsapp_message: "Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Cupins."
+      },
+      {
+        id: "serv-05",
+        name: "Controle de Mosquitos e Pernilongos",
+        short_description: "Mais conforto para sua família.",
+        full_description: "Redução da proliferação de mosquitos, pernilongos e focos de criadouros, proporcionando mais conforto e segurança.",
+        image_url: "sparkles",
+        icon_url: "sparkles",
+        category: "Desinsetização",
+        active: true,
+        order: 5,
+        whatsapp_message: "Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Mosquitos e Pernilongos."
+      },
+      {
+        id: "serv-06",
+        name: "Limpeza e Higienização de Caixa d'Água",
+        short_description: "Água limpa e segura para todos.",
+        full_description: "Limpeza completa e desinfecção de caixas d'água residenciais, comerciais e industriais, garantindo água limpa e segura para consumo.",
+        image_url: "droplet",
+        icon_url: "droplet",
+        category: "Limpeza",
+        active: true,
+        order: 6,
+        whatsapp_message: "Olá NEXO! Gostaria de um orçamento para o serviço de Limpeza e Higienização de Caixa d'Água."
       }
     ],
     testimonials: [
