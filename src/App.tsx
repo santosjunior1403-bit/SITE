@@ -42,14 +42,23 @@ export default function App() {
         }
       }
 
-      // Find or create favicon element
-      let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
-      if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.getElementsByTagName('head')[0].appendChild(link);
-      }
-      link.href = url;
+      // Find or style favicon elements
+      const selectors = ['link[rel="icon"]', 'link[rel="shortcut icon"]', 'link[rel="apple-touch-icon"]'];
+      selectors.forEach(selector => {
+        let el: HTMLLinkElement | null = document.querySelector(selector);
+        if (!el) {
+          el = document.createElement('link');
+          const relMatch = selector.match(/rel="([^"]+)"/);
+          if (relMatch) {
+            el.rel = relMatch[1];
+          }
+          if (selector.includes('png')) {
+            el.type = 'image/png';
+          }
+          document.getElementsByTagName('head')[0].appendChild(el);
+        }
+        el.href = url;
+      });
     };
 
     updateFavicon();
