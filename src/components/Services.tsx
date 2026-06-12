@@ -14,7 +14,7 @@ const defaultServices: Service[] = [
     category: 'Dedetização',
     whatsapp_message: 'Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Baratas.',
     active: true,
-    order: 1
+    display_order: 1
   },
   {
     id: 'serv-02',
@@ -26,7 +26,7 @@ const defaultServices: Service[] = [
     category: 'Desratização',
     whatsapp_message: 'Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Ratos.',
     active: true,
-    order: 2
+    display_order: 2
   },
   {
     id: 'serv-03',
@@ -38,7 +38,7 @@ const defaultServices: Service[] = [
     category: 'Dedetização',
     whatsapp_message: 'Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Formigas.',
     active: true,
-    order: 3
+    display_order: 3
   },
   {
     id: 'serv-04',
@@ -50,7 +50,7 @@ const defaultServices: Service[] = [
     category: 'Descupinização',
     whatsapp_message: 'Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Cupins.',
     active: true,
-    order: 4
+    display_order: 4
   },
   {
     id: 'serv-05',
@@ -62,7 +62,7 @@ const defaultServices: Service[] = [
     category: 'Desinsetização',
     whatsapp_message: 'Olá NEXO! Gostaria de um orçamento para o serviço de Controle de Mosquitos e Pernilongos.',
     active: true,
-    order: 5
+    display_order: 5
   },
   {
     id: 'serv-06',
@@ -72,9 +72,9 @@ const defaultServices: Service[] = [
     image_url: 'https://images.unsplash.com/photo-1516841273335-e39b37888115?auto=format&fit=crop&q=80&w=600',
     icon_url: '🚰',
     category: 'Limpeza',
-    whatsapp_message: 'Olá NEXO! Gostaria de um orçamento para o serviço de Limpeza e Higienização de Caixa d\'Água.',
+    whatsapp_message: "Olá NEXO! Gostaria de um orçamento para o serviço de Limpeza e Higienização de Caixa d'Água.",
     active: true,
-    order: 6
+    display_order: 6
   }
 ];
 
@@ -105,7 +105,7 @@ export default function Services() {
           return;
         }
         try {
-          const { data, error } = await supabase.from('services').select('*').order('order');
+          const { data, error } = await supabase.from('services').select('*').order('display_order');
           if (error) {
             console.warn("Could not load services from Supabase, operating with safe local defaults.", error);
             setServices(defaultServices);
@@ -123,7 +123,7 @@ export default function Services() {
                 full_description: s.full_description,
                 category: s.category,
                 active: s.active,
-                order: s.order,
+                display_order: s.display_order,
                 image_url: s.image_url,
                 icon_url: s.icon_url,
                 whatsapp_message: s.whatsapp_message
@@ -133,7 +133,7 @@ export default function Services() {
             await Promise.all(seedPromises);
 
             // Re-fetch now that we successfully seeded
-            const { data: refetchedData } = await supabase.from('services').select('*').order('order');
+            const { data: refetchedData } = await supabase.from('services').select('*').order('display_order');
             if (refetchedData && refetchedData.length > 0) {
               setServices(refetchedData.filter((s: Service) => s.active !== false));
             } else {

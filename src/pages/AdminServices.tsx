@@ -27,7 +27,7 @@ export default function AdminServices() {
   const fetchServices = async () => {
     if (!supabase) return;
     try {
-      const { data, error } = await supabase.from('services').select('*').order('order', { ascending: true });
+      const { data, error } = await supabase.from('services').select('*').order('display_order', { ascending: true });
       if (!error && data) {
         setServices(data);
       }
@@ -67,7 +67,7 @@ export default function AdminServices() {
       image_url: form.image_url || 'bug',
       icon_url: form.icon_url || '🪳',
       active: form.active !== false,
-      order: Number(form.order) || 1,
+      display_order: Number(form.display_order) || 1,
       whatsapp_message: form.whatsapp_message || `Olá NEXO! Gostaria de um orçamento para o serviço de *${form.name}*.`
     };
 
@@ -94,7 +94,7 @@ export default function AdminServices() {
   const editService = (service: Service) => {
     setForm({
       ...service,
-      order: service.order || 1,
+      display_order: service.display_order || 1,
       active: service.active !== false
     });
     // Scroll smoothly to form
@@ -126,7 +126,7 @@ export default function AdminServices() {
       image_url: 'bug',
       icon_url: '🪳',
       active: true,
-      order: services.length + 1,
+      display_order: services.length + 1,
       whatsapp_message: ''
     });
   };
@@ -140,15 +140,15 @@ export default function AdminServices() {
 
     const copy = [...services];
     // Keep reference or assign default sequence if order values are equal or undefined
-    const originalOrder = copy[currentIndex].order || (currentIndex + 1);
-    const targetOrder = copy[targetIndex].order || (targetIndex + 1);
+    const originalOrder = copy[currentIndex].display_order || (currentIndex + 1);
+    const targetOrder = copy[targetIndex].display_order || (targetIndex + 1);
 
     // Make sure we have separate values
     const finalOriginalOrder = originalOrder === targetOrder ? originalOrder + direction : targetOrder;
     const finalTargetOrder = originalOrder;
 
-    copy[currentIndex].order = finalOriginalOrder;
-    copy[targetIndex].order = finalTargetOrder;
+    copy[currentIndex].display_order = finalOriginalOrder;
+    copy[targetIndex].display_order = finalTargetOrder;
 
     try {
       setLoading(true);
@@ -400,7 +400,7 @@ export default function AdminServices() {
                     <h4 className="font-bold text-lg mt-1 text-white">{s.name}</h4>
                   </div>
                   <div className="text-xs font-bold text-gray-400">
-                    Ordem: #{s.order || (idx + 1)}
+                    Ordem: #{s.display_order || (idx + 1)}
                   </div>
                 </div>
 

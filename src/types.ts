@@ -51,7 +51,7 @@ export interface Service {
   full_description: string;
   category: string;
   price?: number;
-  order: number;
+  display_order: number;
   active: boolean;
   image_url: string;
   icon_url: string;
