@@ -110,12 +110,8 @@ export default function AdminCompany() {
         alert("Erro ao salvar no Supabase: " + error.message);
       } else {
         alert("Salvo com sucesso!");
-        if (savedData) {
-          setSettings(savedData);
-          setForm(savedData);
-        } else {
-          await fetchSettings();
-        }
+        // Re-query company_settings to bypass any stale data caches
+        await fetchSettings();
       }
     } catch (err: any) {
       alert("Exceção ao salvar: " + err.message);

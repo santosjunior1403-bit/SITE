@@ -1,7 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Output the exact Supabase URL to the console per user requirements
+console.log('SUPABASE_URL usado em produção:', supabaseUrl);
 
 const projectRef = supabaseUrl ? (supabaseUrl.includes('//') ? supabaseUrl.split('//')[1]?.split('.')[0] : 'Desconhecido') : 'Desconhecido';
 
@@ -441,6 +444,29 @@ const normalizeOutputData = (tableName: string, data: any): any => {
   return normalizeRow(data);
 };
 
+function isTableNotExistError(error: any): boolean {
+  if (!error) return false;
+  const message = error.message || '';
+  const code = error.code || '';
+  
+  // If the error message mentions "schema cache" or dynamic schema updates, the table exists.
+  if (message.includes('schema cache') || message.includes('PGRST301') || code === 'PGRST301') {
+    return false;
+  }
+
+  // PostgreSQL "undefined_table" code is "42P01"
+  if (code === '42P01') {
+    return true;
+  }
+  
+  // PostgREST "Could not find" or "does not exist" message (table missing from DB)
+  if (message.includes('does not exist') || message.includes('Could not find')) {
+    return true;
+  }
+  
+  return false;
+}
+
 function createSafeBuilder(originalBuilder: any, tableName: string) {
   let mode: 'select' | 'insert' | 'update' | 'upsert' | 'delete' = 'select';
   let payload: any = null;
@@ -492,14 +518,8 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
 
           const realPromise = target;
           return realPromise.then((result: any) => {
-            if (result.error && (
-              result.error.message?.includes('schema cache') ||
-              result.error.message?.includes('does not exist') ||
-              result.error.message?.includes('Could not find') ||
-              result.error.status === 400 ||
-              result.error.status === 404
-            )) {
-              console.warn(`[SUPABASE PROXY] Table "${tableName}" requested failed (schema cache / non-existent error):`, result.error.message);
+            if (result.error && isTableNotExistError(result.error)) {
+              console.warn(`[SUPABASE PROXY] Table "${tableName}" requested failed (non-existent error):`, result.error.message);
               console.log(`[SUPABASE PROXY] Deploying fallback for table "${tableName}"...`);
               
               if (mode === 'select') {
