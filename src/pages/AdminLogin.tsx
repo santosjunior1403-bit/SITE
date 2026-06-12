@@ -87,33 +87,8 @@ export default function AdminLogin() {
     }
 
     if (error) {
-      let friendlyError = error.message;
-
-      // Robust check to distinguish 'Senha incorreta' vs 'Usuário não encontrado'
-      try {
-        const { data: existingProfiles, error: checkError } = await supabase
-          .from('admin_profiles')
-          .select('email')
-          .eq('email', emailNormalized);
-
-        if (checkError) {
-          console.warn('[DEBUG AdminLogin] DB Profile lookup failed:', checkError.message);
-        }
-
-        if (!existingProfiles || existingProfiles.length === 0) {
-          friendlyError = "Usuário não encontrado";
-        } else {
-          friendlyError = "Senha incorreta";
-        }
-      } catch (dbCheckErr) {
-        console.warn('[DEBUG AdminLogin] DB Check exception:', dbCheckErr);
-        if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
-          friendlyError = "Senha incorreta ou Usuário não cadastrado como administrador";
-        }
-      }
-
-      setError(friendlyError);
-      alert(friendlyError);
+      setError(error.message);
+      alert(error.message);
       setLoading(false);
       return;
     }
@@ -147,53 +122,7 @@ export default function AdminLogin() {
       return;
     }
 
-    // 3. Authorize or Create Profile for master admin accounts
-    let authorized = false;
-    
-    if (isMasterAdmin) {
-      console.log('[DEBUG AdminLogin] User is master admin. Ensuring admin_profile exists in database.');
-      authorized = true; // Auto-authorize master admin regardless of profile state
-      
-      try {
-        const profileData = {
-          id: user.id,
-          email: emailNormalized,
-          name: 'Administrador Master',
-          role: 'admin',
-          perfil: 'admin',
-          active: true,
-          ativo: true
-        };
-        
-        const { error: upsertError } = await supabase
-          .from('admin_profiles')
-          .upsert(profileData, { onConflict: 'id' });
-
-        if (upsertError) {
-          console.warn('[DEBUG AdminLogin] Upsert full fields failed, trying basic fields:', upsertError.message);
-          // Retry with safe basic fields in case 'perfil' or 'ativo' columns do not exist
-          const { error: retryError } = await supabase
-            .from('admin_profiles')
-            .upsert({
-              id: user.id,
-              email: emailNormalized,
-              role: 'admin',
-              active: true
-            }, { onConflict: 'id' });
-
-          if (retryError) {
-            console.error('[DEBUG AdminLogin] Secondary basic upsert failed:', retryError.message);
-          } else {
-            console.log('[DEBUG AdminLogin] Basic upsert succeeded!');
-          }
-        } else {
-          console.log('[DEBUG AdminLogin] Full profile upsert succeeded!');
-        }
-      } catch (upsertCatch: any) {
-        console.warn('[DEBUG AdminLogin] Exception during profile upsert:', upsertCatch);
-      }
-    }
-
+    // 3. Check for Profile or Create Automatically if it does not exist
     console.log('[DEBUG AdminLogin] Fetching admin profile for user ID:', user.id);
     let profile = null;
     let profileError = null;
@@ -216,6 +145,51 @@ export default function AdminLogin() {
       error: profileError ? profileError.message : null
     });
 
+    // Se o perfil não existir, vamos criar automaticamente!
+    if (!profile) {
+      console.log('[DEBUG AdminLogin] Profile does not exist. Creating automatically...');
+      const profileData = {
+        id: user.id,
+        email: emailNormalized,
+        name: isMasterAdmin ? 'Administrador Master' : 'Administrador',
+        role: 'admin',
+        perfil: 'admin',
+        active: true,
+        ativo: true
+      };
+
+      try {
+        const { error: upsertError } = await supabase
+          .from('admin_profiles')
+          .upsert(profileData, { onConflict: 'id' });
+
+        if (upsertError) {
+          console.warn('[DEBUG AdminLogin] Premium fields profile upsert failed, trying base fields:', upsertError.message);
+          const { error: retryError } = await supabase
+            .from('admin_profiles')
+            .upsert({
+              id: user.id,
+              email: emailNormalized,
+              role: 'admin',
+              active: true
+            }, { onConflict: 'id' });
+
+          if (retryError) {
+            console.error('[DEBUG AdminLogin] Basic upsert fallback failed:', retryError.message);
+          } else {
+            console.log('[DEBUG AdminLogin] Fallback base profile persistent.');
+            profile = { id: user.id, email: emailNormalized, role: 'admin', active: true };
+          }
+        } else {
+          console.log('[DEBUG AdminLogin] Profile auto-creation succeeded!');
+          profile = profileData;
+        }
+      } catch (upsertCatch: any) {
+        console.warn('[DEBUG AdminLogin] Exception persistent auto profile:', upsertCatch);
+      }
+    }
+
+    let authorized = false;
     if (isMasterAdmin) {
       authorized = true;
     } else if (profile && 
