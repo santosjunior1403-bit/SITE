@@ -19,7 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     // Define robust fallback SEO tags so they match requirements precisely
-    document.title = 'NEXO Dedetizadora | TESTE VERCEL 123';
+    document.title = 'NEXO Dedetizadora | Dedetização em São Paulo';
     
     try {
       const metaDesc = document.querySelector('meta[name="description"]');
