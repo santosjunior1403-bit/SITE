@@ -4,15 +4,21 @@ import { supabase } from '../lib/supabase';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [logo, setLogo] = useState('');
+  const [logo, setLogo] = useState('/favicon.png');
 
   useEffect(() => {
     if (!supabase) {
-        setLogo('https://via.placeholder.com/150');
+        setLogo('/favicon.png');
         return;
     }
     supabase.from('company_settings').select('logo_url').single().then(({ data }) => {
-      if (data) setLogo(data.logo_url);
+      if (data && data.logo_url) {
+        setLogo(data.logo_url);
+      } else {
+        setLogo('/favicon.png');
+      }
+    }).catch(() => {
+      setLogo('/favicon.png');
     });
   }, []);
 

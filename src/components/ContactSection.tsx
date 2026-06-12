@@ -13,15 +13,35 @@ export default function ContactSection() {
   
   const [whatsappNum, setWhatsappNum] = useState('5511999999999');
   const [success, setSuccess] = useState(false);
+  const [companySettings, setCompanySettings] = useState({
+    phone: '(11) 4003-9128',
+    email: 'contato@nexodedetizadora.com.br',
+    business_hours: 'Segunda a Sábado — 08:00 às 18:00'
+  });
 
   useEffect(() => {
     if (!supabase) return;
+    
+    // Fetch whatsapp_number from hero_section
     supabase.from('hero_section').select('whatsapp_number').single().then(({ data }) => {
       if (data && data.whatsapp_number) {
         setWhatsappNum(data.whatsapp_number.replace(/\D/g, ''));
       }
     }).catch(err => {
       console.warn("Could not query custom contact WhatsApp number:", err);
+    });
+
+    // Fetch phone, email, business_hours from company_settings
+    supabase.from('company_settings').select('phone, email, business_hours').single().then(({ data }) => {
+      if (data) {
+        setCompanySettings({
+          phone: data.phone || '(11) 4003-9128',
+          email: data.email || 'contato@nexodedetizadora.com.br',
+          business_hours: data.business_hours || 'Segunda a Sábado — 08:00 às 18:00'
+        });
+      }
+    }).catch(err => {
+      console.warn("Could not query company settings in ContactSection:", err);
     });
   }, []);
 
@@ -79,7 +99,7 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-400 text-sm">Central de Atendimento</h4>
-                    <p className="text-white font-medium block mt-1">(11) 4003-9128</p>
+                    <p className="text-white font-medium block mt-1">{companySettings.phone}</p>
                   </div>
                 </div>
 
@@ -89,7 +109,7 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-300 text-sm">E-mail Corporativo</h4>
-                    <p className="text-white font-medium block mt-1 leading-snug">contato@nexodedetizadora.com.br</p>
+                    <p className="text-white font-medium block mt-1 leading-snug">{companySettings.email}</p>
                   </div>
                 </div>
 
@@ -99,7 +119,7 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-yellow-500 text-sm">Horários Operacionais</h4>
-                    <p className="text-white font-medium block mt-1 text-sm">Segunda a Sábado — 08:00 às 18:00</p>
+                    <p className="text-white font-medium block mt-1 text-sm">{companySettings.business_hours}</p>
                   </div>
                 </div>
               </div>

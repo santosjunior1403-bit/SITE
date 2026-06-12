@@ -50,6 +50,7 @@ const getFallbackData = (table: string): any => {
       subtitle: "Protegendo sua família e seu patrimônio com agilidade, segurança e garantia.",
       badge_text: "Atendimento 24 horas em São Paulo",
       whatsapp_number: "5511999999999",
+      button_text: "FALE CONOSCO",
       image_url: "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=1200"
     },
     services: [
@@ -211,6 +212,115 @@ const deleteFallbackData = (table: string, id: string) => {
   }
 };
 
+// ---------------- DATABASE SCHEMAS DEFINITIONS FOR SANITIZATION & NORMALIZATION ----------------
+const ALLOWED_COLUMNS: Record<string, string[]> = {
+  company_settings: [
+    'id', 'company_name', 'logo_url', 'phone', 'email', 'address', 'city',
+    'state', 'cep', 'instagram_url', 'facebook_url', 'google_business_url',
+    'clients_attended', 'services_completed', 'customer_satisfaction', 'business_hours'
+  ],
+  hero_section: [
+    'id', 'title', 'subtitle', 'image_url', 'active', 'created_at'
+  ],
+  blog_posts: [
+    'id', 'title', 'slug', 'content', 'image_url', 'published', 'created_at'
+  ],
+  admin_profiles: [
+    'id', 'user_id', 'email', 'nome', 'perfil', 'ativo', 'created_at'
+  ]
+};
+
+// Mapping and sanitization helpers
+const sanitizeAndSavePayload = (tableName: string, originalPayload: any): any => {
+  if (!originalPayload) return originalPayload;
+  
+  // 1. Save completely to localStorage so client features are 100% intact
+  saveFallbackData(tableName, originalPayload, originalPayload.id);
+
+  // 2. If we don't have constraints defined, send as is
+  const allowed = ALLOWED_COLUMNS[tableName];
+  if (!allowed) return originalPayload;
+
+  // 3. Make column conversion transformations
+  let processed = { ...originalPayload };
+
+  if (tableName === 'blog_posts') {
+    processed.image_url = processed.image_url || processed.main_image_url;
+    if (processed.active !== undefined && processed.published === undefined) {
+      processed.published = processed.active;
+    }
+    if (!processed.slug && processed.title) {
+      processed.slug = processed.title.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove accents
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+    }
+  }
+
+  if (tableName === 'admin_profiles') {
+    processed.user_id = processed.user_id || processed.id;
+    processed.nome = processed.nome || processed.name;
+    processed.perfil = processed.perfil || processed.role || 'admin';
+    if (processed.ativo === undefined && processed.active !== undefined) {
+      processed.ativo = processed.active;
+    }
+  }
+
+  // 4. Strip non-existent columns to avoid database exceptions
+  const sanitized: Record<string, any> = {};
+  allowed.forEach(col => {
+    if (processed[col] !== undefined) {
+      sanitized[col] = processed[col];
+    }
+  });
+
+  console.log(`[SUPABASE PROXY] Sanited payload for "${tableName}":`, sanitized);
+  return sanitized;
+};
+
+// Map output data when loading from Supabase, merging with cached fallback fields
+const normalizeOutputData = (tableName: string, data: any): any => {
+  if (!data) return data;
+
+  const fallbackSource = getFallbackData(tableName);
+
+  const normalizeRow = (row: any): any => {
+    if (!row) return row;
+    let normalized = { ...row };
+
+    // Find custom offline fields to merge
+    if (fallbackSource) {
+      if (Array.isArray(fallbackSource)) {
+        const matching = fallbackSource.find((item: any) => String(item.id) === String(row.id));
+        if (matching) {
+          normalized = { ...matching, ...normalized };
+        }
+      } else if (fallbackSource.id === row.id || !row.id) {
+        normalized = { ...fallbackSource, ...normalized };
+      }
+    }
+
+    // Apply strict field aliases
+    if (tableName === 'blog_posts') {
+      normalized.main_image_url = normalized.main_image_url || normalized.image_url;
+      normalized.active = normalized.active !== undefined ? normalized.active : (normalized.published !== undefined ? normalized.published : true);
+    }
+
+    if (tableName === 'admin_profiles') {
+      normalized.name = normalized.name || normalized.nome;
+      normalized.role = normalized.role || normalized.perfil;
+      normalized.active = normalized.active !== undefined ? normalized.active : (normalized.ativo !== undefined ? normalized.ativo : true);
+    }
+
+    return normalized;
+  };
+
+  if (Array.isArray(data)) {
+    return data.map(normalizeRow);
+  }
+  return normalizeRow(data);
+};
+
 function createSafeBuilder(originalBuilder: any, tableName: string) {
   let mode: 'select' | 'insert' | 'update' | 'upsert' | 'delete' = 'select';
   let payload: any = null;
@@ -234,10 +344,12 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
           if (singleMode) {
             fb = Array.isArray(fb) ? fb[0] : fb;
           }
-          resolve({ data: fb, error: null });
+          const normalized = normalizeOutputData(tableName, fb);
+          resolve({ data: normalized, error: null });
         } else if (mode === 'insert' || mode === 'update' || mode === 'upsert') {
           saveFallbackData(tableName, payload, updateId || payload?.id);
-          resolve({ data: payload, error: null });
+          const normalized = normalizeOutputData(tableName, payload);
+          resolve({ data: normalized, error: null });
         } else if (mode === 'delete') {
           if (filterCol === 'id' && filterVal) {
             deleteFallbackData(tableName, filterVal);
@@ -282,16 +394,23 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
                 if (singleMode) {
                   fb = Array.isArray(fb) ? fb[0] : fb;
                 }
-                return resolve({ data: fb, error: null });
+                const normalized = normalizeOutputData(tableName, fb);
+                return resolve({ data: normalized, error: null });
               } else if (mode === 'insert' || mode === 'update' || mode === 'upsert') {
                 saveFallbackData(tableName, payload, updateId || payload?.id);
-                return resolve({ data: payload, error: null });
+                const normalized = normalizeOutputData(tableName, payload);
+                return resolve({ data: normalized, error: null });
               } else if (mode === 'delete') {
                 if (filterCol === 'id' && filterVal) {
                   deleteFallbackData(tableName, filterVal);
                 }
                 return resolve({ data: null, error: null });
               }
+            }
+
+            // If success, enrich the returned data with normalized fields
+            if (result.data) {
+              result.data = normalizeOutputData(tableName, result.data);
             }
             return resolve(result);
           }).catch((err: any) => {
@@ -301,7 +420,8 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
               if (singleMode) {
                 fb = Array.isArray(fb) ? fb[0] : fb;
               }
-              return resolve({ data: fb, error: null });
+              const normalized = normalizeOutputData(tableName, fb);
+              return resolve({ data: normalized, error: null });
             } else {
               if (payload) {
                 saveFallbackData(tableName, payload);
@@ -319,13 +439,13 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
             mode = 'select';
           } else if (lowerProp === 'insert') {
             mode = 'insert';
-            payload = args[0];
+            payload = sanitizeAndSavePayload(tableName, args[0]);
           } else if (lowerProp === 'update') {
             mode = 'update';
-            payload = args[0];
+            payload = sanitizeAndSavePayload(tableName, args[0]);
           } else if (lowerProp === 'upsert') {
             mode = 'upsert';
-            payload = args[0];
+            payload = sanitizeAndSavePayload(tableName, args[0]);
           } else if (lowerProp === 'delete') {
             mode = 'delete';
           } else if (lowerProp === 'eq') {
@@ -334,7 +454,11 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
             if (filterCol === 'id') {
               updateId = args[1];
             }
-          } else if (lowerProp === 'single') {
+            // For query operations like .eq('active', true), map to 'published' for blog_posts
+            if (tableName === 'blog_posts' && filterCol === 'active') {
+              filterCol = 'published';
+            }
+          } else if (lowerProp === 'single' || lowerProp === 'maybesingle') {
             singleMode = true;
           }
           return new Proxy({}, proxyHandler);
@@ -345,17 +469,22 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
       if (typeof originalVal === 'function') {
         return function(...args: any[]) {
           const lowerProp = prop.toLowerCase();
+          let runtimeArgs = [...args];
+
           if (lowerProp === 'select') {
             mode = 'select';
           } else if (lowerProp === 'insert') {
             mode = 'insert';
-            payload = args[0];
+            runtimeArgs[0] = sanitizeAndSavePayload(tableName, args[0]);
+            payload = runtimeArgs[0];
           } else if (lowerProp === 'update') {
             mode = 'update';
-            payload = args[0];
+            runtimeArgs[0] = sanitizeAndSavePayload(tableName, args[0]);
+            payload = runtimeArgs[0];
           } else if (lowerProp === 'upsert') {
             mode = 'upsert';
-            payload = args[0];
+            runtimeArgs[0] = sanitizeAndSavePayload(tableName, args[0]);
+            payload = runtimeArgs[0];
           } else if (lowerProp === 'delete') {
             mode = 'delete';
           } else if (lowerProp === 'eq') {
@@ -364,11 +493,20 @@ function createSafeBuilder(originalBuilder: any, tableName: string) {
             if (filterCol === 'id') {
               updateId = args[1];
             }
-          } else if (lowerProp === 'single') {
+            // Translate query column filters inside real remote queries as well
+            if (tableName === 'blog_posts' && filterCol === 'active') {
+              runtimeArgs[0] = 'published';
+              filterCol = 'published';
+            }
+            if (tableName === 'admin_profiles' && filterCol === 'active') {
+              runtimeArgs[0] = 'ativo';
+              filterCol = 'ativo';
+            }
+          } else if (lowerProp === 'single' || lowerProp === 'maybesingle') {
             singleMode = true;
           }
 
-          const nextBuilder = originalVal.apply(target, args);
+          const nextBuilder = originalVal.apply(target, runtimeArgs);
           return new Proxy(nextBuilder, proxyHandler);
         };
       }
