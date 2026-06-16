@@ -5,25 +5,43 @@ import { supabase } from '../lib/supabase';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [logo, setLogo] = useState('/favicon.png');
+  const [menu, setMenu] = useState({
+    menu_inicio: 'Início',
+    menu_servicos: 'Serviços',
+    menu_quem_somos: 'Quem Somos',
+    menu_faq: 'FAQ',
+    menu_agendar: 'Agendar'
+  });
 
   useEffect(() => {
     if (!supabase) {
         setLogo('/favicon.png');
         return;
     }
-    const fetchLogo = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await supabase.from('company_settings').select('logo_url').single();
-        if (data && data.logo_url) {
-          setLogo(data.logo_url);
+        const { data: logoData } = await supabase.from('company_settings').select('logo_url').single();
+        if (logoData && logoData.logo_url) {
+          setLogo(logoData.logo_url);
         } else {
           setLogo('/favicon.png');
+        }
+
+        const { data: menuData } = await supabase.from('seo_settings').select('menu_inicio, menu_servicos, menu_quem_somos, menu_faq, menu_agendar').single();
+        if (menuData) {
+            setMenu({
+                menu_inicio: menuData.menu_inicio || 'Início',
+                menu_servicos: menuData.menu_servicos || 'Serviços',
+                menu_quem_somos: menuData.menu_quem_somos || 'Quem Somos',
+                menu_faq: menuData.menu_faq || 'FAQ',
+                menu_agendar: menuData.menu_agendar || 'Agendar'
+            });
         }
       } catch (err) {
         setLogo('/favicon.png');
       }
     };
-    fetchLogo();
+    fetchData();
   }, []);
 
   return (
@@ -46,14 +64,14 @@ export default function Navbar() {
             </a>
           </div>
           <div className="hidden md:flex space-x-6 items-center">
-            <a href="#inicio" className="hover:text-[#00C853] transition-colors font-semibold">Início</a>
-            <a href="#servicos" className="hover:text-[#00C853] transition-colors font-semibold">Serviços</a>
-            <a href="#quem-somos" className="hover:text-[#00C853] transition-colors font-semibold">Quem Somos</a>
-            <a href="#faq" className="hover:text-[#00C853] transition-colors font-semibold">FAQ</a>
+            <a href="#inicio" className="hover:text-[#00C853] transition-colors font-semibold">{menu.menu_inicio}</a>
+            <a href="#servicos" className="hover:text-[#00C853] transition-colors font-semibold">{menu.menu_servicos}</a>
+            <a href="#quem-somos" className="hover:text-[#00C853] transition-colors font-semibold">{menu.menu_quem_somos}</a>
+            <a href="#faq" className="hover:text-[#00C853] transition-colors font-semibold">{menu.menu_faq}</a>
             
             <span className="h-6 w-[1.5px] bg-gray-200" />
             
-            <a href="#contato" className="bg-[#00C853] text-white px-6 py-2.5 rounded-full hover:bg-[#00a846] transition-all font-bold text-sm shadow-md hover:shadow-lg">Agendar</a>
+            <a href="#contato" className="bg-[#00C853] text-white px-6 py-2.5 rounded-full hover:bg-[#00a846] transition-all font-bold text-sm shadow-md hover:shadow-lg">{menu.menu_agendar}</a>
           </div>
           <div className="md:hidden flex items-center">
             <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg text-[#081A3A] hover:bg-gray-50 focus:outline-none">
@@ -71,28 +89,28 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)} 
             className="px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-800 transition-colors font-semibold text-base"
           >
-            Início
+            {menu.menu_inicio}
           </a>
           <a 
             href="#servicos" 
             onClick={() => setIsOpen(false)} 
             className="px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-800 transition-colors font-semibold text-base"
           >
-            Serviços
+            {menu.menu_servicos}
           </a>
           <a 
             href="#quem-somos" 
             onClick={() => setIsOpen(false)} 
             className="px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-800 transition-colors font-semibold text-base"
           >
-            Quem Somos
+            {menu.menu_quem_somos}
           </a>
           <a 
             href="#faq" 
             onClick={() => setIsOpen(false)} 
             className="px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-800 transition-colors font-semibold text-base"
           >
-            FAQ
+            {menu.menu_faq}
           </a>
           <hr className="border-gray-100" />
           <a 
@@ -100,7 +118,7 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)} 
             className="bg-[#00C853] text-white text-center px-5 py-3 rounded-xl hover:bg-[#00a846] transition-all font-bold text-sm shadow-md"
           >
-            Agendar Consulta
+            {menu.menu_agendar}
           </a>
         </div>
       )}

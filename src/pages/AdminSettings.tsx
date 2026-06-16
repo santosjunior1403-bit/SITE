@@ -14,11 +14,22 @@ interface Settings {
   footer_text: string;
   member_area_enabled: boolean;
   site_active: boolean;
+  menu_inicio: string;
+  menu_servicos: string;
+  menu_quem_somos: string;
+  menu_faq: string;
+  menu_agendar: string;
 }
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<Settings | null>(null);
-  const [form, setForm] = useState<Partial<Settings>>({});
+  const [form, setForm] = useState<Partial<Settings>>({
+    menu_inicio: 'Início',
+    menu_servicos: 'Serviços',
+    menu_quem_somos: 'Quem Somos',
+    menu_faq: 'FAQ',
+    menu_agendar: 'Agendar'
+  });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => { fetchSettings(); }, []);
@@ -55,6 +66,11 @@ export default function AdminSettings() {
       <form onSubmit={handleSave} className="bg-gray-800 p-8 rounded-xl border border-gray-700 grid md:grid-cols-2 gap-4">
         <input className="bg-gray-700 p-3 rounded" value={form.seo_title || ''} onChange={e => setForm({...form, seo_title: e.target.value})} placeholder="SEO Título" />
         <input className="bg-gray-700 p-3 rounded" value={form.whatsapp_message || ''} onChange={e => setForm({...form, whatsapp_message: e.target.value})} placeholder="WhatsApp Mensagem" />
+        <input className="bg-gray-700 p-3 rounded" value={form.menu_inicio || ''} onChange={e => setForm({...form, menu_inicio: e.target.value})} placeholder="Texto menu Início" />
+        <input className="bg-gray-700 p-3 rounded" value={form.menu_servicos || ''} onChange={e => setForm({...form, menu_servicos: e.target.value})} placeholder="Texto menu Serviços" />
+        <input className="bg-gray-700 p-3 rounded" value={form.menu_quem_somos || ''} onChange={e => setForm({...form, menu_quem_somos: e.target.value})} placeholder="Texto menu Quem Somos" />
+        <input className="bg-gray-700 p-3 rounded" value={form.menu_faq || ''} onChange={e => setForm({...form, menu_faq: e.target.value})} placeholder="Texto menu FAQ" />
+        <input className="bg-gray-700 p-3 rounded" value={form.menu_agendar || ''} onChange={e => setForm({...form, menu_agendar: e.target.value})} placeholder="Texto menu Agendar" />
         <textarea className="col-span-2 bg-gray-700 p-3 rounded" value={form.seo_description || ''} onChange={e => setForm({...form, seo_description: e.target.value})} placeholder="SEO Descrição" />
         <label className="text-sm text-gray-300 col-span-2">Imagem de Compartilhamento</label>
         <input type="file" onChange={handleUpload} className="bg-gray-700 p-3 rounded col-span-2" />
